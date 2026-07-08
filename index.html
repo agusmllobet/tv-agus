@@ -112,13 +112,14 @@
   .season-progress .fill{height:100%;background:var(--teal);border-radius:999px;}
   .ticket{
     background:var(--surface);
-    display:flex;overflow:hidden;margin-bottom:0;position:relative;
-    border-bottom:1px solid var(--line);padding:14px 0;
+    display:flex;overflow:hidden;position:relative;
+    margin:0 -16px 22px;padding:0;
   }
-  .ticket .poster{width:96px;min-width:96px;height:130px;border-radius:10px;background:var(--surface-2);object-fit:cover;}
-  .ticket .poster-ph{width:96px;min-width:96px;height:130px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:10px;text-align:center;}
+  .ticket .poster{width:120px;min-width:120px;height:168px;border-radius:0;background:var(--surface-2);object-fit:cover;}
+  .ticket .poster-ph{width:120px;min-width:120px;height:168px;border-radius:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:10px;text-align:center;}
   .ticket .perf{display:none;}
-  .ticket .body{flex:1;padding:0 14px;min-width:0;}
+  .ticket .body{flex:1;padding:0 16px;min-width:0;}
+  .ticket .check{margin:auto 16px;}
   .ticket .name-pill{
     display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--ink);border-radius:999px;
     padding:6px 12px;font-weight:800;font-size:13px;margin-bottom:10px;max-width:100%;
