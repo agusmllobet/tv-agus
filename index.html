@@ -95,11 +95,13 @@
   }
   .error-text{color:var(--danger);font-size:13px;margin-top:8px;min-height:18px;font-weight:600;}
   .marquee-label{
-    display:flex;align-items:center;gap:7px;margin:22px 0 12px;font-size:13px;
-    text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:800;
+    display:flex;justify-content:center;margin:22px 0 14px;
   }
   .marquee-label:first-child{margin-top:0;}
-  .marquee-label .bulb{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  .marquee-label span{
+    background:var(--surface-2);color:var(--ink-soft);font-size:12px;font-weight:800;
+    letter-spacing:.04em;text-transform:uppercase;padding:8px 18px;border-radius:999px;
+  }
   .toptabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin:-4px -16px 16px;padding:0 16px;}
   .toptab{
     flex:1;text-align:center;padding:12px 4px 13px;font-size:13px;font-weight:800;letter-spacing:.04em;
@@ -109,24 +111,34 @@
   .season-progress{height:4px;background:var(--surface-2);border-radius:999px;overflow:hidden;margin-top:8px;}
   .season-progress .fill{height:100%;background:var(--teal);border-radius:999px;}
   .ticket{
-    background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);border:1px solid var(--line);
-    display:flex;overflow:hidden;margin-bottom:10px;position:relative;
+    background:var(--surface);
+    display:flex;overflow:hidden;margin-bottom:0;position:relative;
+    border-bottom:1px solid var(--line);padding:14px 0;
   }
-  .ticket .poster{width:64px;min-width:64px;background:var(--surface-2);object-fit:cover;}
-  .ticket .poster-ph{width:64px;min-width:64px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:10px;text-align:center;}
+  .ticket .poster{width:96px;min-width:96px;height:130px;border-radius:10px;background:var(--surface-2);object-fit:cover;}
+  .ticket .poster-ph{width:96px;min-width:96px;height:130px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:10px;text-align:center;}
   .ticket .perf{display:none;}
-  .ticket .body{flex:1;padding:12px 14px;min-width:0;}
+  .ticket .body{flex:1;padding:0 14px;min-width:0;}
+  .ticket .name-pill{
+    display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--ink);border-radius:999px;
+    padding:6px 12px;font-weight:800;font-size:13px;margin-bottom:10px;max-width:100%;
+  }
+  .ticket .name-pill span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .ticket .name{font-weight:800;font-size:14.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .ticket .ep-code{font-weight:800;font-size:15px;color:var(--ink);}
-  .ticket .ep-title{font-size:13px;color:var(--ink-soft);margin-top:2px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ticket .ep-code{font-weight:800;font-size:17px;color:var(--ink);}
+  .ticket .ep-title{font-size:14px;color:var(--ink);margin-top:2px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .ticket .pending{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
+  .ticket .premiere-tag{
+    display:inline-block;background:var(--ink);color:#fff;font-size:11px;font-weight:800;
+    letter-spacing:.03em;padding:5px 10px;border-radius:6px;margin-top:10px;
+  }
   .ticket .check{
-    width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--surface);
-    display:flex;align-items:center;justify-content:center;margin:auto 12px;cursor:pointer;flex-shrink:0;
+    width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;margin:auto 4px;cursor:pointer;flex-shrink:0;
     font-size:15px;color:transparent;transition:.15s;
   }
   .ticket .check:active{transform:scale(0.9);}
-  .ticket .check.done{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .ticket .check.done{background:var(--surface-2);border-color:var(--line);color:var(--ink);}
   .ticket.uptodate .body .ep-code{color:var(--gold);}
   .ticket .uptodate-tag{font-size:12px;color:var(--gold);font-weight:800;}
   .empty-state{text-align:center;padding:48px 20px;color:var(--ink-soft);}
@@ -384,7 +396,7 @@ function render(){
       <button class="icon-btn" id="btn-export" title="Exportar mis datos">⇩</button>
     </div>
     <div class="content">${body}</div>
-    ${state.view !== 'detail' && state.view !== 'import' ? renderBottomNav() : ''}
+    ${renderBottomNav()}
   `;
   bindGlobal();
   if(state.view === 'watchlist') bindWatchList();
@@ -500,23 +512,23 @@ function renderWatchList(){
       return `
       <div class="ticket uptodate" data-show="${show.id}">
         ${show.image_url ? `<img class="poster" src="${show.image_url}"/>` : `<div class="poster-ph">sin imagen</div>`}
-        <div class="perf"></div>
         <div class="body">
-          <div class="name">${escapeHtml(show.name)}</div>
+          <div class="name-pill"><span>${escapeHtml(show.name)}</span> ›</div>
           <div class="uptodate-tag">Al día ✦ esperando estrenos</div>
         </div>
       </div>`;
     }
     const ep = info.next;
     const code = `S${String(ep.season).padStart(2,'0')} | E${String(ep.number||0).padStart(2,'0')}`;
+    const isPremiere = ep.number === 1;
     return `
     <div class="ticket" data-show="${show.id}">
       ${show.image_url ? `<img class="poster" src="${show.image_url}"/>` : `<div class="poster-ph">sin imagen</div>`}
-      <div class="perf"></div>
       <div class="body">
-        <div class="name">${escapeHtml(show.name)}</div>
+        <div class="name-pill"><span>${escapeHtml(show.name)}</span> ›</div>
         <div class="ep-code">${code}${info.remaining>0? ' <span style=\"color:var(--ink-soft);font-weight:600;\">+'+info.remaining+'</span>':''}</div>
         <div class="ep-title">${escapeHtml(ep.name || 'Episodio')}</div>
+        ${isPremiere ? `<div class="premiere-tag">PREMIERE</div>` : ''}
       </div>
       <div class="check" data-mark-episode="${show.id}:${ep.id}:${ep.season}:${ep.number}" title="Marcar como visto">✓</div>
     </div>`;
@@ -524,13 +536,13 @@ function renderWatchList(){
 
   let html = '';
   if(seguir.length){
-    html += `<div class="marquee-label"><span class="bulb"></span> Seguir viendo</div>` + seguir.map(ticket).join('');
+    html += `<div class="marquee-label"><span>Seguir viendo</span></div>` + seguir.map(ticket).join('');
   }
   if(haceTiempo.length){
-    html += `<div class="marquee-label"><span class="bulb"></span> Hace tiempo no ves</div>` + haceTiempo.map(ticket).join('');
+    html += `<div class="marquee-label"><span>Hace tiempo no ves</span></div>` + haceTiempo.map(ticket).join('');
   }
   if(alDia.length){
-    html += `<div class="marquee-label"><span class="bulb"></span> Al día</div>` + alDia.map(ticket).join('');
+    html += `<div class="marquee-label"><span>Al día</span></div>` + alDia.map(ticket).join('');
   }
   if(loadingShows.length){
     html += `<div class="spinner"></div>`;
@@ -559,7 +571,7 @@ function renderUpcomingTab(){
     <div class="ticket" data-show="${show.id}">
       ${show.image_url ? `<img class="poster" src="${show.image_url}"/>` : `<div class="poster-ph">sin imagen</div>`}
       <div class="body">
-        <div class="name">${escapeHtml(show.name)}</div>
+        <div class="name-pill"><span>${escapeHtml(show.name)}</span> ›</div>
         <div class="ep-code">${code}</div>
         <div class="ep-title">${escapeHtml(ep.name || 'Episodio')} · estrena ${dateLabel}</div>
       </div>
