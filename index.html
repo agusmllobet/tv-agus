@@ -439,12 +439,7 @@ function bindLogin(){
 async function afterLogin(){
   state.view = 'loading'; render();
   await refreshAllData();
-  const { count } = await supabase.from('tvagus_import_review').select('*', {count:'exact', head:true}).eq('resolved', false);
-  if(state.shows.length === 0 && !state._skipImportPrompt){
-    state.view = 'import';
-  } else {
-    state.view = 'watchlist';
-  }
+  state.view = 'watchlist';
   render();
   preloadEpisodeCaches();
 }
