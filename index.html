@@ -4,123 +4,123 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>TV agus!</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23A6323A%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22%23FAF7F1%22 font-family=%22Georgia%22>tv</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%236C5CE7%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22>tv</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
-    --bg: #FAF7F1;
+    --bg: #FFFFFF;
     --surface: #FFFFFF;
-    --surface-2: #F1ECE2;
-    --ink: #262420;
-    --ink-soft: #6E6A62;
-    --line: #E7E0D2;
-    --accent: #A6323A;
-    --accent-ink: #FFF6F2;
-    --gold: #D9A441;
-    --teal: #3E7C74;
-    --amber-bg: #FBEFD9;
-    --danger: #B23A3A;
+    --surface-2: #F4F4F7;
+    --ink: #16161D;
+    --ink-soft: #8B8B96;
+    --line: #ECECF1;
+    --accent: #6C5CE7;
+    --accent-ink: #FFFFFF;
+    --gold: #FFB020;
+    --teal: #1FBF83;
+    --amber-bg: #FFF3DC;
+    --danger: #FF4757;
     --radius: 14px;
-    --radius-lg: 20px;
-    --shadow: 0 1px 2px rgba(38,36,32,0.06), 0 6px 20px rgba(38,36,32,0.06);
+    --radius-lg: 18px;
+    --shadow: 0 1px 2px rgba(20,20,30,0.04), 0 4px 16px rgba(20,20,30,0.06);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     background:var(--bg);
     color:var(--ink);
-    font-family:'Inter',system-ui,sans-serif;
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
     -webkit-font-smoothing:antialiased;
     min-height:100vh;
     padding-bottom:84px;
   }
   h1,h2,h3,.display{
-    font-family:'Fraunces',Georgia,serif;
-    font-weight:600;
-    letter-spacing:-0.01em;
+    font-family:'Inter',system-ui,sans-serif;
+    font-weight:800;
+    letter-spacing:-0.02em;
     margin:0;
   }
-  .mono{font-family:'IBM Plex Mono',monospace;}
+  .mono{font-family:'Inter',sans-serif;font-weight:700;}
   button{font-family:inherit;}
   a{color:inherit;}
   #app{max-width:640px;margin:0 auto;min-height:100vh;position:relative;}
   .topbar{
     position:sticky;top:0;z-index:20;
-    background:var(--bg);
-    padding:18px 18px 10px;
+    background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);
+    padding:16px 18px 12px;
     display:flex;align-items:center;justify-content:space-between;
     border-bottom:1px solid var(--line);
   }
-  .topbar h1{font-size:22px;display:flex;align-items:center;gap:8px;}
-  .topbar .bulb{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);display:inline-block;}
+  .topbar h1{font-size:20px;display:flex;align-items:center;gap:7px;font-weight:800;}
+  .topbar .bulb{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;}
   .icon-btn{
-    border:none;background:var(--surface-2);width:38px;height:38px;border-radius:50%;
+    border:none;background:var(--surface-2);width:38px;height:38px;border-radius:12px;
     display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;
   }
   .icon-btn:active{transform:scale(0.94);}
   .content{padding:16px 16px 32px;}
   .bottomnav{
     position:fixed;bottom:0;left:0;right:0;z-index:30;
-    background:var(--surface);border-top:1px solid var(--line);
-    display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    background:rgba(255,255,255,0.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+    display:flex;justify-content:space-around;padding:10px 6px calc(10px + env(safe-area-inset-bottom));
     max-width:640px;margin:0 auto;
   }
   .navbtn{
     background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;
-    color:var(--ink-soft);font-size:11px;cursor:pointer;padding:4px 10px;border-radius:10px;
+    color:var(--ink-soft);font-size:11px;font-weight:600;cursor:pointer;padding:4px 14px;border-radius:12px;
   }
   .navbtn.active{color:var(--accent);}
-  .navbtn .ic{font-size:19px;}
+  .navbtn .ic{font-size:20px;}
   .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
-  .login-wrap .display{font-size:34px;margin-bottom:6px;}
-  .login-wrap .sub{color:var(--ink-soft);margin-bottom:28px;font-size:14px;}
+  .login-wrap .display{font-size:32px;margin-bottom:6px;font-weight:900;}
+  .login-wrap .sub{color:var(--ink-soft);margin-bottom:26px;font-size:14px;font-weight:500;}
   .pin-input{
-    font-family:'IBM Plex Mono',monospace;font-size:26px;letter-spacing:10px;text-align:center;
-    width:220px;padding:14px 10px;border-radius:var(--radius);border:1px solid var(--line);
-    background:var(--surface);margin-bottom:16px;
+    font-family:'Inter',sans-serif;font-weight:800;font-size:28px;letter-spacing:12px;text-align:center;
+    width:240px;padding:16px 10px 16px 22px;border-radius:16px;border:2px solid var(--line);
+    background:var(--surface-2);margin-bottom:18px;color:var(--ink);
   }
-  .pin-input:focus{outline:2px solid var(--gold);}
+  .pin-input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
   .primary-btn{
-    background:var(--accent);color:var(--accent-ink);border:none;border-radius:999px;
-    padding:13px 28px;font-size:15px;font-weight:600;cursor:pointer;
+    background:var(--accent);color:var(--accent-ink);border:none;border-radius:14px;
+    padding:15px 30px;font-size:15px;font-weight:700;cursor:pointer;
   }
   .primary-btn:active{transform:scale(0.98);}
   .primary-btn[disabled]{opacity:.5;cursor:default;}
   .ghost-btn{
-    background:none;border:1px solid var(--line);border-radius:999px;padding:11px 22px;
-    font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);
+    background:var(--surface-2);border:none;border-radius:14px;padding:12px 22px;
+    font-size:14px;font-weight:700;cursor:pointer;color:var(--ink);
   }
-  .error-text{color:var(--danger);font-size:13px;margin-top:8px;min-height:18px;}
+  .error-text{color:var(--danger);font-size:13px;margin-top:8px;min-height:18px;font-weight:600;}
   .marquee-label{
-    display:flex;align-items:center;gap:8px;margin:22px 0 12px;font-size:13px;
-    text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);font-weight:700;
+    display:flex;align-items:center;gap:7px;margin:22px 0 12px;font-size:13px;
+    text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:800;
   }
   .marquee-label:first-child{margin-top:0;}
-  .marquee-label .bulb{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+  .marquee-label .bulb{width:6px;height:6px;border-radius:50%;background:var(--accent);}
   .ticket{
-    background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);
-    display:flex;overflow:hidden;margin-bottom:12px;position:relative;
+    background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);border:1px solid var(--line);
+    display:flex;overflow:hidden;margin-bottom:10px;position:relative;
   }
-  .ticket .poster{width:78px;min-width:78px;background:var(--surface-2);object-fit:cover;}
-  .ticket .poster-ph{width:78px;min-width:78px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:11px;text-align:center;}
-  .ticket .perf{width:0;border-left:2px dashed var(--line);position:relative;}
+  .ticket .poster{width:64px;min-width:64px;background:var(--surface-2);object-fit:cover;}
+  .ticket .poster-ph{width:64px;min-width:64px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:10px;text-align:center;}
+  .ticket .perf{display:none;}
   .ticket .body{flex:1;padding:12px 14px;min-width:0;}
-  .ticket .name{font-weight:700;font-size:14.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .ticket .ep-code{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:var(--accent);}
-  .ticket .ep-title{font-size:13px;color:var(--ink-soft);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ticket .name{font-weight:800;font-size:14.5px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ticket .ep-code{font-weight:800;font-size:13px;color:var(--accent);}
+  .ticket .ep-title{font-size:13px;color:var(--ink-soft);margin-top:2px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .ticket .pending{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
   .ticket .check{
-    width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:var(--surface);
+    width:34px;height:34px;border-radius:50%;border:2px solid var(--line);background:var(--surface);
     display:flex;align-items:center;justify-content:center;margin:auto 12px;cursor:pointer;flex-shrink:0;
-    font-size:16px;color:transparent;transition:.15s;
+    font-size:15px;color:transparent;transition:.15s;
   }
   .ticket .check:active{transform:scale(0.9);}
   .ticket .check.done{background:var(--teal);border-color:var(--teal);color:#fff;}
   .ticket.uptodate .body .ep-code{color:var(--gold);}
-  .ticket .uptodate-tag{font-size:12px;color:var(--gold);font-weight:700;}
+  .ticket .uptodate-tag{font-size:12px;color:var(--gold);font-weight:800;}
   .empty-state{text-align:center;padding:48px 20px;color:var(--ink-soft);}
   .empty-state .display{font-size:19px;color:var(--ink);margin-bottom:6px;}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
@@ -162,9 +162,11 @@
     padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer;
   }
   .season-row.complete{border-left:3px solid var(--teal);}
-  .episode-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);}
-  .episode-row .ecode{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);width:52px;flex-shrink:0;}
-  .episode-row .etitle{flex:1;font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .episode-row{
+    display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);
+  }
+  .episode-row .ecode{font-weight:800;font-size:12px;color:var(--ink-soft);width:52px;flex-shrink:0;}
+  .episode-row .etitle{flex:1;font-size:13.5px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .episode-row .echeck{
     width:30px;height:30px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;cursor:pointer;
     display:flex;align-items:center;justify-content:center;color:transparent;font-size:14px;
@@ -405,7 +407,7 @@ function renderLogin(){
   <div class="login-wrap">
     <div class="display">TV agus!</div>
     <div class="sub">Ingresá tu PIN</div>
-    <input type="password" inputmode="numeric" maxlength="6" class="pin-input" id="pin-field" placeholder="••••••" />
+    <input type="password" inputmode="numeric" maxlength="6" class="pin-input" id="pin-field" placeholder="••••••" autofocus autocomplete="off" />
     <div class="error-text" id="pin-error"></div>
     <button class="primary-btn" id="pin-submit">Entrar</button>
   </div>`;
@@ -416,6 +418,7 @@ function bindLogin(){
   const err = document.getElementById('pin-error');
   const submit = document.getElementById('pin-submit');
   field.focus();
+  setTimeout(()=>field.focus(), 60);
   async function doLogin(){
     const pin = field.value.trim();
     if(!pin){ return; }
