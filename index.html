@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>TV agus!</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23A6323A%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22%23FAF7F1%22 font-family=%22Georgia%22>tv</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --bg: #FAF7F1;
+    --surface: #FFFFFF;
+    --surface-2: #F1ECE2;
+    --ink: #262420;
+    --ink-soft: #6E6A62;
+    --line: #E7E0D2;
+    --accent: #A6323A;
+    --accent-ink: #FFF6F2;
+    --gold: #D9A441;
+    --teal: #3E7C74;
+    --amber-bg: #FBEFD9;
+    --danger: #B23A3A;
+    --radius: 14px;
+    --radius-lg: 20px;
+    --shadow: 0 1px 2px rgba(38,36,32,0.06), 0 6px 20px rgba(38,36,32,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom:84px;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces',Georgia,serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  button{font-family:inherit;}
+  a{color:inherit;}
+  #app{max-width:640px;margin:0 auto;min-height:100vh;position:relative;}
+  .topbar{
+    position:sticky;top:0;z-index:20;
+    background:var(--bg);
+    padding:18px 18px 10px;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--line);
+  }
+  .topbar h1{font-size:22px;display:flex;align-items:center;gap:8px;}
+  .topbar .bulb{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);display:inline-block;}
+  .icon-btn{
+    border:none;background:var(--surface-2);width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;
+  }
+  .icon-btn:active{transform:scale(0.94);}
+  .content{padding:16px 16px 32px;}
+  .bottomnav{
+    position:fixed;bottom:0;left:0;right:0;z-index:30;
+    background:var(--surface);border-top:1px solid var(--line);
+    display:flex;justify-content:space-around;padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    max-width:640px;margin:0 auto;
+  }
+  .navbtn{
+    background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--ink-soft);font-size:11px;cursor:pointer;padding:4px 10px;border-radius:10px;
+  }
+  .navbtn.active{color:var(--accent);}
+  .navbtn .ic{font-size:19px;}
+  .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+  .login-wrap .display{font-size:34px;margin-bottom:6px;}
+  .login-wrap .sub{color:var(--ink-soft);margin-bottom:28px;font-size:14px;}
+  .pin-input{
+    font-family:'IBM Plex Mono',monospace;font-size:26px;letter-spacing:10px;text-align:center;
+    width:220px;padding:14px 10px;border-radius:var(--radius);border:1px solid var(--line);
+    background:var(--surface);margin-bottom:16px;
+  }
+  .pin-input:focus{outline:2px solid var(--gold);}
+  .primary-btn{
+    background:var(--accent);color:var(--accent-ink);border:none;border-radius:999px;
+    padding:13px 28px;font-size:15px;font-weight:600;cursor:pointer;
+  }
+  .primary-btn:active{transform:scale(0.98);}
+  .primary-btn[disabled]{opacity:.5;cursor:default;}
+  .ghost-btn{
+    background:none;border:1px solid var(--line);border-radius:999px;padding:11px 22px;
+    font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);
+  }
+  .error-text{color:var(--danger);font-size:13px;margin-top:8px;min-height:18px;}
+  .marquee-label{
+    display:flex;align-items:center;gap:8px;margin:22px 0 12px;font-size:13px;
+    text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);font-weight:700;
+  }
+  .marquee-label:first-child{margin-top:0;}
+  .marquee-label .bulb{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+  .ticket{
+    background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);
+    display:flex;overflow:hidden;margin-bottom:12px;position:relative;
+  }
+  .ticket .poster{width:78px;min-width:78px;background:var(--surface-2);object-fit:cover;}
+  .ticket .poster-ph{width:78px;min-width:78px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:11px;text-align:center;}
+  .ticket .perf{width:0;border-left:2px dashed var(--line);position:relative;}
+  .ticket .body{flex:1;padding:12px 14px;min-width:0;}
+  .ticket .name{font-weight:700;font-size:14.5px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ticket .ep-code{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:13px;color:var(--accent);}
+  .ticket .ep-title{font-size:13px;color:var(--ink-soft);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ticket .pending{font-size:11.5px;color:var(--ink-soft);margin-top:6px;}
+  .ticket .check{
+    width:36px;height:36px;border-radius:50%;border:2px solid var(--line);background:var(--surface);
+    display:flex;align-items:center;justify-content:center;margin:auto 12px;cursor:pointer;flex-shrink:0;
+    font-size:16px;color:transparent;transition:.15s;
+  }
+  .ticket .check:active{transform:scale(0.9);}
+  .ticket .check.done{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .ticket.uptodate .body .ep-code{color:var(--gold);}
+  .ticket .uptodate-tag{font-size:12px;color:var(--gold);font-weight:700;}
+  .empty-state{text-align:center;padding:48px 20px;color:var(--ink-soft);}
+  .empty-state .display{font-size:19px;color:var(--ink);margin-bottom:6px;}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .grid-card{border-radius:12px;overflow:hidden;position:relative;aspect-ratio:2/3;background:var(--surface-2);cursor:pointer;}
+  .grid-card img{width:100%;height:100%;object-fit:cover;display:block;}
+  .grid-card .no-img{display:flex;align-items:center;justify-content:center;height:100%;font-size:11px;color:var(--ink-soft);text-align:center;padding:8px;}
+  .grid-card .statusbar{position:absolute;bottom:0;left:0;right:0;height:5px;}
+  .st-watching{background:#4C9A82;}
+  .st-plan_to_watch{background:#D9A441;}
+  .st-paused{background:#9A7FBF;}
+  .st-dropped{background:#B23A3A;}
+  .st-completed{background:#3E6FA6;}
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .chip{
+    border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;
+    font-size:12.5px;cursor:pointer;color:var(--ink-soft);font-weight:600;
+  }
+  .chip.active{background:var(--ink);color:var(--surface);border-color:var(--ink);}
+  .detail-hero{
+    height:200px;border-radius:var(--radius-lg);background-size:cover;background-position:center;
+    position:relative;margin-bottom:14px;display:flex;align-items:flex-end;overflow:hidden;
+  }
+  .detail-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(20,18,15,.75));}
+  .detail-hero .info{position:relative;padding:16px;color:#fff;z-index:1;}
+  .detail-hero .info h2{font-size:22px;color:#fff;}
+  .detail-hero .info .meta{font-size:13px;opacity:.85;margin-top:2px;}
+  .status-select{
+    width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--surface);
+    font-size:14px;font-weight:600;margin-bottom:14px;color:var(--ink);
+  }
+  .season-row{
+    background:var(--surface);border-radius:12px;padding:13px 14px;margin-bottom:8px;
+    display:flex;align-items:center;justify-content:space-between;cursor:pointer;box-shadow:var(--shadow);
+  }
+  .season-row .left{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;}
+  .season-row .count{font-size:12.5px;color:var(--ink-soft);font-weight:600;}
+  .season-row .mark-all{
+    border:1px solid var(--teal);color:var(--teal);background:none;border-radius:999px;
+    padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer;
+  }
+  .season-row.complete{border-left:3px solid var(--teal);}
+  .episode-row{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);}
+  .episode-row .ecode{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);width:52px;flex-shrink:0;}
+  .episode-row .etitle{flex:1;font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .episode-row .echeck{
+    width:30px;height:30px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:transparent;font-size:14px;
+  }
+  .episode-row .echeck.done{background:var(--teal);border-color:var(--teal);color:#fff;}
+  .action-row{display:flex;gap:8px;margin-top:18px;}
+  .danger-link{color:var(--danger);font-size:13px;text-align:center;margin-top:20px;cursor:pointer;text-decoration:underline;}
+  .search-box{
+    display:flex;gap:8px;margin-bottom:16px;position:sticky;top:70px;background:var(--bg);padding-bottom:8px;z-index:10;
+  }
+  .search-box input{
+    flex:1;padding:12px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:14.5px;
+  }
+  .result-row{
+    display:flex;gap:12px;background:var(--surface);border-radius:14px;padding:10px;margin-bottom:10px;
+    box-shadow:var(--shadow);align-items:center;cursor:pointer;
+  }
+  .result-row img{width:52px;height:74px;object-fit:cover;border-radius:8px;background:var(--surface-2);}
+  .result-row .rname{font-weight:700;font-size:14.5px;}
+  .result-row .rmeta{font-size:12px;color:var(--ink-soft);}
+  .import-drop{
+    border:2px dashed var(--line);border-radius:var(--radius-lg);padding:36px 20px;text-align:center;
+    color:var(--ink-soft);cursor:pointer;background:var(--surface);
+  }
+  .progress-bar{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden;margin:14px 0;}
+  .progress-bar .fill{height:100%;background:var(--gold);transition:width .2s;}
+  .review-card{background:var(--surface);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow);}
+  .review-card .rtitle{font-weight:700;margin-bottom:4px;}
+  .review-card .rreason{font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;}
+  .review-card select, .review-card input{
+    width:100%;padding:9px;border-radius:8px;border:1px solid var(--line);margin-bottom:8px;font-size:13.5px;
+  }
+  .toast{
+    position:fixed;bottom:96px;left:50%;transform:translateX(-50%);
+    background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;
+    z-index:100;opacity:0;transition:opacity .2s;pointer-events:none;
+  }
+  .toast.show{opacity:1;}
+  .spinner{
+    width:22px;height:22px;border-radius:50%;border:3px solid var(--surface-2);border-top-color:var(--accent);
+    animation:spin .7s linear infinite;margin:20px auto;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  ::-webkit-scrollbar{width:0;height:0;}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://zimbmlxmjrsfcnqpjsqc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_cLQb-5Bq-vJeKNgQ8s7sgA_J73S0X2T';
+const AUTH_EMAIL = 'agus_mllobet@hotmail.com';
+const TVMAZE = 'https://api.tvmaze.com';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const STATUS_LABELS = {
+  watching: 'Viendo',
+  plan_to_watch: 'Pendiente por empezar',
+  paused: 'Pausada',
+  dropped: 'Abandonada',
+  completed: 'Completada'
+};
+
+let state = {
+  view: 'loading',
+  user: null,
+  shows: [],
+  episodeCache: {},
+  watchedMap: {},
+  currentShowId: null,
+  libraryFilter: 'all',
+  importData: null,
+};
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>t.classList.remove('show'), 2400);
+}
+
+async function tvmazeLookupByTvdb(thetvdbId){
+  try{
+    const r = await fetch(`${TVMAZE}/lookup/shows?thetvdb=${thetvdbId}`);
+    if(r.status === 404) return null;
+    if(!r.ok) return null;
+    return await r.json();
+  }catch(e){ return null; }
+}
+
+async function tvmazeSearch(query){
+  const r = await fetch(`${TVMAZE}/search/shows?q=${encodeURIComponent(query)}`);
+  if(!r.ok) return [];
+  const data = await r.json();
+  return data.map(d => d.show);
+}
+
+async function tvmazeEpisodes(showId){
+  const r = await fetch(`${TVMAZE}/shows/${showId}/episodes?specials=1`);
+  if(!r.ok) return [];
+  const eps = await r.json();
+  eps.sort((a,b)=>{
+    const da = a.airstamp ? new Date(a.airstamp).getTime() : null;
+    const db_ = b.airstamp ? new Date(b.airstamp).getTime() : null;
+    if(da && db_) return da - db_;
+    if(a.season !== b.season) return a.season - b.season;
+    return a.number - b.number;
+  });
+  return eps;
+}
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+async function loadShows(){
+  const { data, error } = await supabase.from('tvagus_shows').select('*').order('name');
+  if(error){ console.error(error); toast('Error cargando biblioteca'); return []; }
+  return data;
+}
+
+async function loadWatched(showIds){
+  if(showIds.length === 0) return {};
+  const { data, error } = await supabase
+    .from('tvagus_watched_episodes')
+    .select('show_id, tvmaze_episode_id')
+    .in('show_id', showIds);
+  if(error){ console.error(error); return {}; }
+  const map = {};
+  for(const row of data){
+    if(!map[row.show_id]) map[row.show_id] = new Set();
+    map[row.show_id].add(row.tvmaze_episode_id);
+  }
+  return map;
+}
+
+async function loadEpisodeCache(showId, tvmazeId, forceRefresh=false){
+  if(state.episodeCache[showId] && !forceRefresh) return state.episodeCache[showId];
+  const { data } = await supabase.from('tvagus_episode_cache').select('*').eq('show_id', showId).maybeSingle();
+  const dayMs = 1000*60*60*24;
+  if(data && !forceRefresh && (Date.now() - new Date(data.fetched_at).getTime() < dayMs)){
+    state.episodeCache[showId] = data.episodes;
+    return data.episodes;
+  }
+  const eps = await tvmazeEpisodes(tvmazeId);
+  await supabase.from('tvagus_episode_cache').upsert({
+    show_id: showId, user_id: state.user.id, episodes: eps, fetched_at: new Date().toISOString()
+  });
+  state.episodeCache[showId] = eps;
+  return eps;
+}
+
+async function refreshAllData(){
+  state.shows = await loadShows();
+  state.watchedMap = await loadWatched(state.shows.map(s=>s.id));
+}
+
+function nextEpisodeFor(show){
+  const eps = state.episodeCache[show.id];
+  if(!eps) return { loading: true };
+  const watched = state.watchedMap[show.id] || new Set();
+  const today = todayISO();
+  const aired = eps.filter(e => e.airdate && e.airdate <= today);
+  const pendingAired = aired.filter(e => !watched.has(e.id));
+  const totalAired = aired.length;
+  const watchedAiredCount = aired.filter(e => watched.has(e.id)).length;
+  if(pendingAired.length === 0){
+    return { upToDate:true, remaining:0, totalAired, watchedAiredCount };
+  }
+  const next = pendingAired[0];
+  return { next, remaining: pendingAired.length - 1, totalAired, watchedAiredCount };
+}
+
+function lastWatchedTime(show){
+  return new Date(show.updated_at || show.created_at).getTime();
+}
+
+function render(){
+  const app = document.getElementById('app');
+  if(state.view === 'loading'){
+    app.innerHTML = `<div class="login-wrap"><div class="spinner"></div></div>`;
+    return;
+  }
+  if(state.view === 'login'){
+    app.innerHTML = renderLogin();
+    bindLogin();
+    return;
+  }
+
+  let body = '';
+  if(state.view === 'watchlist') body = renderWatchList();
+  else if(state.view === 'library') body = renderLibrary();
+  else if(state.view === 'detail') body = renderDetail();
+  else if(state.view === 'search') body = renderSearch();
+  else if(state.view === 'import') body = renderImport();
+
+  app.innerHTML = `
+    <div class="topbar">
+      <h1><span class="bulb"></span> TV agus!</h1>
+      <button class="icon-btn" id="btn-export" title="Exportar mis datos">⇩</button>
+    </div>
+    <div class="content">${body}</div>
+    ${state.view !== 'detail' && state.view !== 'import' ? renderBottomNav() : ''}
+  `;
+  bindGlobal();
+  if(state.view === 'watchlist') bindWatchList();
+  if(state.view === 'library') bindLibrary();
+  if(state.view === 'detail') bindDetail();
+  if(state.view === 'search') bindSearch();
+  if(state.view === 'import') bindImport();
+}
+
+function renderBottomNav(){
+  return `
+  <div class="bottomnav">
+    <button class="navbtn ${state.view==='watchlist'?'active':''}" data-nav="watchlist"><span class="ic">📺</span>Watch List</button>
+    <button class="navbtn ${state.view==='library'?'active':''}" data-nav="library"><span class="ic">🗂️</span>Mis series</button>
+    <button class="navbtn ${state.view==='search'?'active':''}" data-nav="search"><span class="ic">🔎</span>Buscar</button>
+  </div>`;
+}
+
+function bindGlobal(){
+  document.querySelectorAll('[data-nav]').forEach(b=>{
+    b.onclick = ()=>{ state.view = b.dataset.nav; render(); };
+  });
+  const exportBtn = document.getElementById('btn-export');
+  if(exportBtn) exportBtn.onclick = exportMyData;
+}
+
+function renderLogin(){
+  return `
+  <div class="login-wrap">
+    <div class="display">TV agus!</div>
+    <div class="sub">Ingresá tu PIN</div>
+    <input type="password" inputmode="numeric" maxlength="6" class="pin-input" id="pin-field" placeholder="••••••" />
+    <div class="error-text" id="pin-error"></div>
+    <button class="primary-btn" id="pin-submit">Entrar</button>
+  </div>`;
+}
+
+function bindLogin(){
+  const field = document.getElementById('pin-field');
+  const err = document.getElementById('pin-error');
+  const submit = document.getElementById('pin-submit');
+  field.focus();
+  async function doLogin(){
+    const pin = field.value.trim();
+    if(!pin){ return; }
+    submit.disabled = true; submit.textContent = 'Entrando...';
+    const { data, error } = await supabase.auth.signInWithPassword({ email: AUTH_EMAIL, password: pin });
+    submit.disabled = false; submit.textContent = 'Entrar';
+    if(error){
+      err.textContent = 'PIN incorrecto';
+      return;
+    }
+    state.user = data.user;
+    await afterLogin();
+  }
+  submit.onclick = doLogin;
+  field.addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+}
+
+async function afterLogin(){
+  state.view = 'loading'; render();
+  await refreshAllData();
+  const { count } = await supabase.from('tvagus_import_review').select('*', {count:'exact', head:true}).eq('resolved', false);
+  if(state.shows.length === 0 && !state._skipImportPrompt){
+    state.view = 'import';
+  } else {
+    state.view = 'watchlist';
+  }
+  render();
+  preloadEpisodeCaches();
+}
+
+async function preloadEpisodeCaches(){
+  for(const show of state.shows){
+    if(show.status === 'watching' || show.status === 'paused'){
+      await loadEpisodeCache(show.id, show.tvmaze_id);
+      if(state.view === 'watchlist') render();
+    }
+  }
+}
+
+function renderWatchList(){
+  const active = state.shows.filter(s => ['watching','paused'].includes(s.status));
+  if(active.length === 0){
+    return `<div class="empty-state"><div class="display">Tu cartelera está vacía</div>
+      <p>Agregá series desde "Buscar" o importá tu historial de TV Time.</p>
+      <button class="primary-btn" data-nav="search" style="margin-top:10px;">Buscar series</button>
+      <div style="margin-top:14px;"><button class="ghost-btn" data-nav="import">Importar de TV Time</button></div>
+    </div>`;
+  }
+
+  const withNext = [];
+  const loadingShows = [];
+  for(const s of active){
+    const info = nextEpisodeFor(s);
+    if(info.loading){ loadingShows.push(s); continue; }
+    withNext.push({ show: s, info });
+  }
+
+  const recentThreshold = Date.now() - 1000*60*60*24*30;
+  const seguir = withNext.filter(x => !x.info.upToDate && lastWatchedTime(x.show) >= recentThreshold);
+  const haceTiempo = withNext.filter(x => !x.info.upToDate && lastWatchedTime(x.show) < recentThreshold);
+  const alDia = withNext.filter(x => x.info.upToDate);
+
+  function ticket({show, info}){
+    if(info.upToDate){
+      return `
+      <div class="ticket uptodate" data-show="${show.id}">
+        ${show.image_url ? `<img class="poster" src="${show.image_url}"/>` : `<div class="poster-ph">sin imagen</div>`}
+        <div class="perf"></div>
+        <div class="body">
+          <div class="name">${escapeHtml(show.name)}</div>
+          <div class="uptodate-tag">Al día ✦ esperando estrenos</div>
+        </div>
+      </div>`;
+    }
+    const ep = info.next;
+    const code = `S${String(ep.season).padStart(2,'0')}E${String(ep.number||0).padStart(2,'0')}`;
+    return `
+    <div class="ticket" data-show="${show.id}">
+      ${show.image_url ? `<img class="poster" src="${show.image_url}"/>` : `<div class="poster-ph">sin imagen</div>`}
+      <div class="perf"></div>
+      <div class="body">
+        <div class="name">${escapeHtml(show.name)}</div>
+        <div class="ep-code">${code}${info.remaining>0? ' <span style=\"color:var(--ink-soft);font-weight:600;\">+'+info.remaining+'</span>':''}</div>
+        <div class="ep-title">${escapeHtml(ep.name || 'Episodio')}</div>
+      </div>
+      <div class="check" data-mark-episode="${show.id}:${ep.id}:${ep.season}:${ep.number}" title="Marcar como visto">✓</div>
+    </div>`;
+  }
+
+  let html = '';
+  if(seguir.length){
+    html += `<div class="marquee-label"><span class="bulb"></span> Seguir viendo</div>` + seguir.map(ticket).join('');
+  }
+  if(haceTiempo.length){
+    html += `<div class="marquee-label"><span class="bulb"></span> Hace tiempo no ves</div>` + haceTiempo.map(ticket).join('');
+  }
+  if(alDia.length){
+    html += `<div class="marquee-label"><span class="bulb"></span> Al día</div>` + alDia.map(ticket).join('');
+  }
+  if(loadingShows.length){
+    html += `<div class="spinner"></div>`;
+  }
+  return html || `<div class="spinner"></div>`;
+}
+
+function bindWatchList(){
+  document.querySelectorAll('[data-show]').forEach(el=>{
+    el.onclick = (e)=>{
+      if(e.target.closest('[data-mark-episode]')) return;
+      state.currentShowId = el.dataset.show; state.view = 'detail'; render();
+    };
+  });
+  document.querySelectorAll('[data-mark-episode]').forEach(el=>{
+    el.onclick = async (e)=>{
+      e.stopPropagation();
+      const [showId, epId] = el.dataset.markEpisode.split(':');
+      await markEpisodeWatched(showId, parseInt(epId));
+      render();
+    };
+  });
+}
+
+async function markEpisodeWatched(showId, tvmazeEpisodeId, seasonNumber=null, episodeNumber=null){
+  if(!state.watchedMap[showId]) state.watchedMap[showId] = new Set();
+  if(state.watchedMap[showId].has(tvmazeEpisodeId)){
+    state.watchedMap[showId].delete(tvmazeEpisodeId);
+    await supabase.from('tvagus_watched_episodes').delete()
+      .eq('show_id', showId).eq('tvmaze_episode_id', tvmazeEpisodeId);
+  } else {
+    state.watchedMap[showId].add(tvmazeEpisodeId);
+    await supabase.from('tvagus_watched_episodes').insert({
+      show_id: showId, user_id: state.user.id, tvmaze_episode_id: tvmazeEpisodeId,
+      season_number: seasonNumber, episode_number: episodeNumber
+    });
+  }
+  await supabase.from('tvagus_shows').update({ updated_at: new Date().toISOString() }).eq('id', showId);
+  const s = state.shows.find(s=>s.id===showId);
+  if(s) s.updated_at = new Date().toISOString();
+}
+
+function renderLibrary(){
+  const filters = ['all','watching','plan_to_watch','paused','dropped','completed'];
+  const filterLabel = { all:'Todas', ...STATUS_LABELS };
+  const shown = state.libraryFilter === 'all' ? state.shows : state.shows.filter(s=>s.status===state.libraryFilter);
+
+  const chips = filters.map(f=>`<button class="chip ${state.libraryFilter===f?'active':''}" data-filter="${f}">${filterLabel[f]}</button>`).join('');
+
+  if(state.shows.length === 0){
+    return `<div class="filter-row">${chips}</div><div class="empty-state"><div class="display">Todavía no agregaste series</div></div>`;
+  }
+
+  const cards = shown.map(s=>`
+    <div class="grid-card" data-show="${s.id}">
+      ${s.image_url ? `<img src="${s.image_url}" alt="${escapeHtml(s.name)}"/>` : `<div class="no-img">${escapeHtml(s.name)}</div>`}
+      <div class="statusbar st-${s.status}"></div>
+    </div>
+  `).join('');
+
+  return `<div class="filter-row">${chips}</div><div class="grid">${cards}</div>`;
+}
+
+function bindLibrary(){
+  document.querySelectorAll('[data-filter]').forEach(el=>{
+    el.onclick = ()=>{ state.libraryFilter = el.dataset.filter; render(); };
+  });
+  document.querySelectorAll('[data-show]').forEach(el=>{
+    el.onclick = ()=>{ state.currentShowId = el.dataset.show; state.view='detail'; render(); };
+  });
+}
+
+let openSeasons = new Set();
+
+function renderDetail(){
+  const show = state.shows.find(s=>s.id===state.currentShowId);
+  if(!show) return `<p>No encontrada.</p>`;
+  const eps = state.episodeCache[show.id];
+
+  if(!eps){
+    loadEpisodeCache(show.id, show.tvmaze_id).then(()=>{ if(state.view==='detail') render(); });
+    return `<button class="ghost-btn" data-back>← Volver</button><div class="spinner"></div>`;
+  }
+
+  const watched = state.watchedMap[show.id] || new Set();
+  const seasons = {};
+  for(const e of eps){
+    const key = e.season;
+    if(!seasons[key]) seasons[key] = [];
+    seasons[key].push(e);
+  }
+  const seasonKeys = Object.keys(seasons).map(Number).sort((a,b)=>a-b);
+
+  const statusOptions = Object.entries(STATUS_LABELS).map(([v,l])=>
+    `<option value="${v}" ${show.status===v?'selected':''}>${l}</option>`).join('');
+
+  let seasonsHtml = seasonKeys.map(sk=>{
+    const list = seasons[sk];
+    const watchedCount = list.filter(e=>watched.has(e.id)).length;
+    const complete = watchedCount === list.length;
+    const label = sk === 0 ? 'Specials' : `Season ${sk}`;
+    const isOpen = openSeasons.has(sk);
+    let episodesHtml = '';
+    if(isOpen){
+      episodesHtml = list.map(e=>{
+        const done = watched.has(e.id);
+        const code = sk===0 ? `SP${String(e.number||0).padStart(2,'0')}` : `S${String(sk).padStart(2,'0')}E${String(e.number||0).padStart(2,'0')}`;
+        return `<div class="episode-row">
+          <div class="ecode">${code}</div>
+          <div class="etitle">${escapeHtml(e.name||'Episodio')}</div>
+          <div class="echeck ${done?'done':''}" data-ep-toggle="${e.id}:${sk}:${e.number}">✓</div>
+        </div>`;
+      }).join('');
+    }
+    return `
+    <div>
+      <div class="season-row ${complete?'complete':''}" data-season-toggle="${sk}">
+        <div class="left">${label} <span class="count">${watchedCount}/${list.length}</span></div>
+        <button class="mark-all" data-mark-season="${sk}">${complete? 'Desmarcar todo':'Marcar todo'}</button>
+      </div>
+      ${episodesHtml}
+    </div>`;
+  }).join('');
+
+  return `
+    <button class="ghost-btn" data-back style="margin-bottom:12px;">← Volver</button>
+    <div class="detail-hero" style="background-image:url('${show.image_url||''}')">
+      <div class="info">
+        <h2>${escapeHtml(show.name)}</h2>
+        <div class="meta">${seasonKeys.length} temporada${seasonKeys.length!==1?'s':''}${show.network? ' · '+escapeHtml(show.network):''}</div>
+      </div>
+    </div>
+    <select class="status-select" id="status-select">${statusOptions}</select>
+    <button class="ghost-btn" id="mark-previous" style="width:100%;margin-bottom:14px;">Marcar todos los anteriores como vistos</button>
+    ${seasonsHtml}
+    <div class="danger-link" id="remove-show">Quitar esta serie de mi biblioteca</div>
+  `;
+}
+
+function bindDetail(){
+  document.querySelector('[data-back]').onclick = ()=>{ state.view = state._detailFrom || 'watchlist'; render(); };
+  const show = state.shows.find(s=>s.id===state.currentShowId);
+
+  document.querySelectorAll('[data-season-toggle]').forEach(el=>{
+    el.onclick = ()=>{
+      const sk = parseInt(el.dataset.seasonToggle);
+      if(openSeasons.has(sk)) openSeasons.delete(sk); else openSeasons.add(sk);
+      render();
+    };
+  });
+
+  document.querySelectorAll('[data-mark-season]').forEach(el=>{
+    el.onclick = async (e)=>{
+      e.stopPropagation();
+      const sk = parseInt(el.dataset.markSeason);
+      const eps = state.episodeCache[show.id].filter(ep=>ep.season===sk);
+      const watched = state.watchedMap[show.id] || new Set();
+      const allDone = eps.every(ep=>watched.has(ep.id));
+      for(const ep of eps){
+        if(allDone){ await markEpisodeWatched(show.id, ep.id); }
+        else if(!watched.has(ep.id)){ await markEpisodeWatched(show.id, ep.id, ep.season, ep.number); }
+      }
+      render();
+    };
+  });
+
+  document.querySelectorAll('[data-ep-toggle]').forEach(el=>{
+    el.onclick = async ()=>{
+      const [id, season, number] = el.dataset.epToggle.split(':');
+      await markEpisodeWatched(show.id, parseInt(id), parseInt(season), parseInt(number));
+      render();
+    };
+  });
+
+  document.getElementById('mark-previous').onclick = async ()=>{
+    const eps = state.episodeCache[show.id];
+    const today = todayISO();
+    const aired = eps.filter(e=>e.airdate && e.airdate<=today);
+    const watched = state.watchedMap[show.id] || new Set();
+    const firstPendingIdx = aired.findIndex(e=>!watched.has(e.id));
+    if(firstPendingIdx === -1){ toast('Ya estás al día'); return; }
+    for(let i=0;i<=firstPendingIdx;i++){
+      const e = aired[i];
+      if(!watched.has(e.id)) await markEpisodeWatched(show.id, e.id, e.season, e.number);
+    }
+    render();
+    toast('Marcados como vistos');
+  };
+
+  document.getElementById('status-select').onchange = async (e)=>{
+    const newStatus = e.target.value;
+    await supabase.from('tvagus_shows').update({ status:newStatus, updated_at:new Date().toISOString() }).eq('id', show.id);
+    show.status = newStatus;
+    toast('Estado actualizado');
+  };
+
+  document.getElementById('remove-show').onclick = async ()=>{
+    if(!confirm(`¿Quitar "${show.name}" de tu biblioteca? Se borra tu progreso de esta serie.`)) return;
+    await supabase.from('tvagus_shows').delete().eq('id', show.id);
+    state.shows = state.shows.filter(s=>s.id!==show.id);
+    state.view = 'library'; render();
+    toast('Serie eliminada');
+  };
+}
+
+function renderSearch(){
+  return `
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Buscar una serie..." />
+    </div>
+    <div id="search-results"></div>
+  `;
+}
+
+function bindSearch(){
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+  let timeout;
+  input.addEventListener('input', ()=>{
+    clearTimeout(timeout);
+    const q = input.value.trim();
+    if(q.length < 2){ results.innerHTML=''; return; }
+    timeout = setTimeout(async ()=>{
+      results.innerHTML = `<div class="spinner"></div>`;
+      const shows = await tvmazeSearch(q);
+      results.innerHTML = shows.map(s=>`
+        <div class="result-row" data-add="${s.id}" data-name="${escapeHtml(s.name)}" data-img="${s.image?.medium||''}" data-network="${escapeHtml(s.network?.name || s.webChannel?.name || '')}" data-premiered="${s.premiered||''}">
+          <img src="${s.image?.medium||''}" />
+          <div>
+            <div class="rname">${escapeHtml(s.name)}</div>
+            <div class="rmeta">${s.premiered? s.premiered.slice(0,4):''} ${s.network?.name?('· '+escapeHtml(s.network.name)):''}</div>
+          </div>
+        </div>
+      `).join('') || `<p style="color:var(--ink-soft);">Sin resultados.</p>`;
+      document.querySelectorAll('[data-add]').forEach(el=>{
+        el.onclick = ()=>addShowFlow(el.dataset);
+      });
+    }, 400);
+  });
+}
+
+async function addShowFlow(ds){
+  const already = state.shows.find(s=>s.tvmaze_id === parseInt(ds.add));
+  if(already){ toast('Ya está en tu biblioteca'); return; }
+  const { data, error } = await supabase.from('tvagus_shows').insert({
+    user_id: state.user.id,
+    tvmaze_id: parseInt(ds.add),
+    name: ds.name,
+    image_url: ds.img || null,
+    network: ds.network || null,
+    premiered: ds.premiered || null,
+    status: 'plan_to_watch'
+  }).select().single();
+  if(error){ toast('Error al agregar'); console.error(error); return; }
+  state.shows.push(data);
+  toast(`${ds.name} agregada`);
+  state.currentShowId = data.id;
+  state._detailFrom = 'search';
+  state.view = 'detail';
+  render();
+}
+
+function renderImport(){
+  if(state.importData?.reviewQueue?.length){
+    return renderImportReview();
+  }
+  return `
+    <button class="ghost-btn" id="skip-import" style="margin-bottom:14px;">Saltar por ahora →</button>
+    <h2 style="margin-bottom:8px;">Importar de TV Time</h2>
+    <p style="color:var(--ink-soft);font-size:14px;margin-bottom:16px;">Subí el archivo .zip que descargaste de TV Time (gdpr-data.zip). Puede tardar unos minutos si tenés muchas series.</p>
+    <div class="import-drop" id="drop-zone">
+      <input type="file" id="file-input" accept=".zip" style="display:none;" />
+      📦 Tocá para elegir el archivo .zip
+    </div>
+    <div id="import-progress"></div>
+  `;
+}
+
+function bindImport(){
+  const skip = document.getElementById('skip-import');
+  if(skip) skip.onclick = ()=>{ state._skipImportPrompt = true; state.view='watchlist'; render(); };
+
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  if(dropZone){
+    dropZone.onclick = ()=>fileInput.click();
+    fileInput.onchange = (e)=>{
+      if(e.target.files[0]) runImport(e.target.files[0]);
+    };
+  }
+  bindImportReviewIfPresent();
+}
+
+async function runImport(file){
+  const progressEl = document.getElementById('import-progress');
+  const dropZone = document.getElementById('drop-zone');
+  dropZone.style.display = 'none';
+  progressEl.innerHTML = `<p>Leyendo archivo...</p><div class="progress-bar"><div class="fill" style="width:0%"></div></div>`;
+  const setProgress = (pct, label) => {
+    progressEl.querySelector('.fill').style.width = pct+'%';
+    let lbl = progressEl.querySelector('.plabel');
+    if(!lbl){ lbl = document.createElement('p'); lbl.className='plabel'; progressEl.appendChild(lbl); }
+    lbl.textContent = label;
+  };
+
+  const zip = await JSZip.loadAsync(file);
+  async function readCSV(name){
+    const f = zip.file(name);
+    if(!f) return [];
+    const text = await f.async('text');
+    return Papa.parse(text, { header:true, skipEmptyLines:true }).data;
+  }
+
+  const followed = await readCSV('followed_tv_show.csv');
+  const userShowData = await readCSV('user_tv_show_data.csv');
+  const tracking = await readCSV('tracking-prod-records.csv');
+  const specialStatus = await readCSV('user_show_special_status.csv');
+
+  const followedMap = {};
+  for(const row of followed){
+    if(!row.tv_show_id) continue;
+    followedMap[row.tv_show_id] = { active: row.active==='1', archived: row.archived==='1', name: row.tv_show_name };
+  }
+  const episodesSeenMap = {};
+  for(const row of userShowData){
+    if(!row.tv_show_id) continue;
+    episodesSeenMap[row.tv_show_id] = { name: row.tv_show_name, nb: parseInt(row.nb_episodes_seen)||0 };
+  }
+  const lastEpMap = {};
+  for(const row of tracking){
+    if(row.type === 'last-episode-watched' && row.series_id){
+      lastEpMap[row.series_id] = { season: parseInt(row.season_number), episode: parseInt(row.episode_number) };
+    }
+  }
+  const specialMap = {};
+  for(const row of specialStatus){
+    if(!row.tv_show_id) continue;
+    specialMap[row.tv_show_id] = row.status;
+  }
+
+  const allIds = new Set([...Object.keys(followedMap), ...Object.keys(episodesSeenMap)]);
+  const idsArr = Array.from(allIds);
+  const reviewQueue = [];
+  let done = 0;
+
+  async function processId(tvTimeId){
+    const name = followedMap[tvTimeId]?.name || episodesSeenMap[tvTimeId]?.name || `ID ${tvTimeId}`;
+    const nb = episodesSeenMap[tvTimeId]?.nb || 0;
+    const followedInfo = followedMap[tvTimeId];
+    const special = specialMap[tvTimeId];
+    const lastEp = lastEpMap[tvTimeId];
+
+    let suggestedStatus = 'plan_to_watch';
+    let needsReview = false;
+    if(special === 'for_later'){
+      suggestedStatus = 'plan_to_watch';
+    } else if(followedInfo && followedInfo.active && !followedInfo.archived){
+      suggestedStatus = 'watching';
+    } else if(followedInfo && (!followedInfo.active || followedInfo.archived) && nb > 0){
+      needsReview = true;
+    } else if(nb === 0){
+      suggestedStatus = 'plan_to_watch';
+    } else if(!followedInfo && nb > 0){
+      needsReview = true;
+    }
+
+    const tvmazeShow = await tvmazeLookupByTvdb(tvTimeId);
+    if(!tvmazeShow){
+      reviewQueue.push({
+        reason:'not_found', tv_time_show_name:name, tv_time_show_id:parseInt(tvTimeId),
+        episodes_seen:nb, last_season:lastEp?.season||null, last_episode:lastEp?.episode||null,
+        suggested_status: suggestedStatus
+      });
+      return;
+    }
+
+    const eps = await tvmazeEpisodes(tvmazeShow.id);
+    let watchedIds = [];
+    if(lastEp && lastEp.season != null){
+      watchedIds = eps.filter(e => e.season < lastEp.season || (e.season===lastEp.season && e.number<=lastEp.episode)).map(e=>e.id);
+    } else if(nb > 0){
+      const regular = eps.filter(e=>e.season>0);
+      watchedIds = regular.slice(0, nb).map(e=>e.id);
+    }
+
+    const { data: insertedShow, error } = await supabase.from('tvagus_shows').insert({
+      user_id: state.user.id,
+      tvmaze_id: tvmazeShow.id,
+      thetvdb_id: parseInt(tvTimeId),
+      name: tvmazeShow.name,
+      image_url: tvmazeShow.image?.medium || null,
+      network: tvmazeShow.network?.name || tvmazeShow.webChannel?.name || null,
+      premiered: tvmazeShow.premiered || null,
+      status: needsReview ? 'paused' : suggestedStatus
+    }).select().single();
+
+    if(error || !insertedShow) return;
+
+    await supabase.from('tvagus_episode_cache').upsert({
+      show_id: insertedShow.id, user_id: state.user.id, episodes: eps, fetched_at: new Date().toISOString()
+    });
+
+    if(watchedIds.length){
+      const rows = watchedIds.map(id=>{
+        const ep = eps.find(e=>e.id===id);
+        return { show_id: insertedShow.id, user_id: state.user.id, tvmaze_episode_id: id, season_number: ep?.season, episode_number: ep?.number };
+      });
+      for(let i=0;i<rows.length;i+=200){
+        await supabase.from('tvagus_watched_episodes').insert(rows.slice(i,i+200));
+      }
+    }
+
+    if(needsReview){
+      reviewQueue.push({
+        reason:'status_unclear', tv_time_show_name:tvmazeShow.name, tv_time_show_id:parseInt(tvTimeId),
+        episodes_seen:nb, last_season:lastEp?.season||null, last_episode:lastEp?.episode||null,
+        suggested_status:'dropped', resolved_tvmaze_id: tvmazeShow.id
+      });
+    }
+  }
+
+  const CONCURRENCY = 4;
+  let idx = 0;
+  async function worker(){
+    while(idx < idsArr.length){
+      const myIdx = idx++;
+      await processId(idsArr[myIdx]);
+      done++;
+      setProgress(Math.round(done/idsArr.length*100), `Importando ${done}/${idsArr.length}...`);
+    }
+  }
+  await Promise.all(Array.from({length:CONCURRENCY}, worker));
+
+  if(reviewQueue.length){
+    for(let i=0;i<reviewQueue.length;i+=200){
+      await supabase.from('tvagus_import_review').insert(
+        reviewQueue.slice(i,i+200).map(r=>({ ...r, user_id: state.user.id }))
+      );
+    }
+  }
+
+  await refreshAllData();
+  state.importData = { reviewQueue: await loadReviewQueue() };
+  render();
+}
+
+async function loadReviewQueue(){
+  const { data } = await supabase.from('tvagus_import_review').select('*').eq('resolved', false).order('tv_time_show_name');
+  return data || [];
+}
+
+function renderImportReview(){
+  const items = state.importData.reviewQueue;
+  if(items.length === 0){
+    return `<div class="empty-state"><div class="display">¡Import completo!</div>
+      <p>Ya podés ver tu biblioteca.</p>
+      <button class="primary-btn" data-nav="watchlist" style="margin-top:12px;">Ir a mi Watch List</button></div>`;
+  }
+  return `
+    <h2 style="margin-bottom:6px;">Revisar ${items.length} series</h2>
+    <p style="color:var(--ink-soft);font-size:13.5px;margin-bottom:16px;">Algunas series necesitan que confirmes algo a mano.</p>
+    ${items.map(it=>`
+      <div class="review-card" data-review-id="${it.id}">
+        <div class="rtitle">${escapeHtml(it.tv_time_show_name)}</div>
+        <div class="rreason">${it.reason==='not_found' ? 'No la encontramos en TVMaze automáticamente. Buscala:' : `Vista pero no seguida en TV Time (${it.episodes_seen} episodios vistos). Elegí un estado:`}</div>
+        ${it.reason==='not_found' ? `
+          <input type="text" placeholder="Buscar serie..." class="review-search" data-review-search="${it.id}" />
+          <div class="review-results" data-review-results="${it.id}"></div>
+        ` : `
+          <select class="review-status" data-review-status="${it.id}">
+            <option value="watching">Viendo</option>
+            <option value="paused">Pausada</option>
+            <option value="dropped" selected>Abandonada</option>
+            <option value="completed">Completada</option>
+            <option value="plan_to_watch">Pendiente por empezar</option>
+          </select>
+          <button class="primary-btn" data-resolve-status="${it.id}" style="width:100%;">Confirmar</button>
+        `}
+      </div>
+    `).join('')}
+  `;
+}
+
+function bindImportReviewIfPresent(){
+  document.querySelectorAll('[data-nav]').forEach(b=>{ b.onclick = ()=>{ state.view=b.dataset.nav; render(); }; });
+
+  document.querySelectorAll('[data-review-search]').forEach(el=>{
+    let t;
+    el.addEventListener('input', ()=>{
+      clearTimeout(t);
+      const q = el.value.trim();
+      const resultsEl = document.querySelector(`[data-review-results="${el.dataset.reviewSearch}"]`);
+      if(q.length<2){ resultsEl.innerHTML=''; return; }
+      t = setTimeout(async ()=>{
+        const shows = await tvmazeSearch(q);
+        resultsEl.innerHTML = shows.slice(0,5).map(s=>`
+          <div class="result-row" data-review-pick="${el.dataset.reviewSearch}" data-pick-id="${s.id}" data-pick-name="${escapeHtml(s.name)}" data-pick-img="${s.image?.medium||''}" data-pick-network="${escapeHtml(s.network?.name||'')}">
+            <img src="${s.image?.medium||''}"/>
+            <div><div class="rname">${escapeHtml(s.name)}</div><div class="rmeta">${s.premiered?s.premiered.slice(0,4):''}</div></div>
+          </div>
+        `).join('');
+        document.querySelectorAll('[data-review-pick]').forEach(pk=>{
+          pk.onclick = ()=>resolveNotFound(pk.dataset);
+        });
+      }, 400);
+    });
+  });
+
+  document.querySelectorAll('[data-resolve-status]').forEach(el=>{
+    el.onclick = ()=>resolveStatusUnclear(el.dataset.resolveStatus);
+  });
+}
+
+async function resolveStatusUnclear(reviewId){
+  const select = document.querySelector(`[data-review-status="${reviewId}"]`);
+  const status = select.value;
+  const item = state.importData.reviewQueue.find(r=>r.id===reviewId);
+  if(item.resolved_tvmaze_id){
+    const show = state.shows.find(s=>s.tvmaze_id === item.resolved_tvmaze_id);
+    if(show){
+      await supabase.from('tvagus_shows').update({ status }).eq('id', show.id);
+      show.status = status;
+    }
+  }
+  await supabase.from('tvagus_import_review').update({ resolved:true, resolved_status:status }).eq('id', reviewId);
+  state.importData.reviewQueue = state.importData.reviewQueue.filter(r=>r.id!==reviewId);
+  render();
+  toast('Actualizado');
+}
+
+async function resolveNotFound(ds){
+  const reviewId = ds.reviewPick;
+  const item = state.importData.reviewQueue.find(r=>r.id===reviewId);
+  const eps = await tvmazeEpisodes(parseInt(ds.pickId));
+  const { data: show } = await supabase.from('tvagus_shows').insert({
+    user_id: state.user.id, tvmaze_id: parseInt(ds.pickId), name: ds.pickName,
+    image_url: ds.pickImg||null, network: ds.pickNetwork||null, status: item.suggested_status || 'plan_to_watch'
+  }).select().single();
+  if(show){
+    await supabase.from('tvagus_episode_cache').upsert({ show_id: show.id, user_id: state.user.id, episodes: eps, fetched_at:new Date().toISOString() });
+    let watchedIds = [];
+    if(item.last_season != null){
+      watchedIds = eps.filter(e=>e.season<item.last_season || (e.season===item.last_season && e.number<=item.last_episode)).map(e=>e.id);
+    } else if(item.episodes_seen>0){
+      watchedIds = eps.filter(e=>e.season>0).slice(0,item.episodes_seen).map(e=>e.id);
+    }
+    if(watchedIds.length){
+      const rows = watchedIds.map(id=>{ const ep=eps.find(e=>e.id===id); return { show_id:show.id, user_id:state.user.id, tvmaze_episode_id:id, season_number:ep?.season, episode_number:ep?.number }; });
+      for(let i=0;i<rows.length;i+=200) await supabase.from('tvagus_watched_episodes').insert(rows.slice(i,i+200));
+    }
+    state.shows.push(show);
+  }
+  await supabase.from('tvagus_import_review').update({ resolved:true }).eq('id', reviewId);
+  state.importData.reviewQueue = state.importData.reviewQueue.filter(r=>r.id!==reviewId);
+  render();
+  toast('Serie agregada');
+}
+
+async function exportMyData(){
+  toast('Preparando export...');
+  const [shows, watched, cache] = await Promise.all([
+    supabase.from('tvagus_shows').select('*'),
+    supabase.from('tvagus_watched_episodes').select('*'),
+    supabase.from('tvagus_episode_cache').select('show_id, episodes')
+  ]);
+  const payload = {
+    exported_at: new Date().toISOString(),
+    shows: shows.data, watched_episodes: watched.data, episode_cache: cache.data
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `tv-agus-export-${todayISO()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(str){
+  if(!str) return '';
+  return str.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function boot(){
+  const { data: { session } } = await supabase.auth.getSession();
+  if(session){
+    state.user = session.user;
+    await afterLogin();
+  } else {
+    state.view = 'login';
+    render();
+  }
+}
+boot();
+</script>
+</body>
+</html>
