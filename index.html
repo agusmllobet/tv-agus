@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>TV agus!</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%236C5CE7%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22>tv</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234A3AA8%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22>tv</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -17,7 +17,7 @@
     --ink: #16161D;
     --ink-soft: #8B8B96;
     --line: #E2E2E8;
-    --accent: #6C5CE7;
+    --accent: #4A3AA8;
     --accent-ink: #FFFFFF;
     --gold: #FFB020;
     --teal: #1FBF83;
@@ -49,7 +49,7 @@
   #app{max-width:640px;margin:0 auto;min-height:100vh;position:relative;}
   .topbar{
     position:sticky;top:0;z-index:20;
-    background:linear-gradient(135deg,#6C5CE7,#8B7BF0);
+    background:linear-gradient(135deg,#4A3AA8,#6B54D6);
     padding:22px 18px 20px;
     display:flex;align-items:center;justify-content:center;position:relative;
   }
@@ -114,15 +114,15 @@
   .season-progress{height:3px;background:var(--surface-2);overflow:hidden;margin:0 0 0;}
   .season-progress .fill{height:100%;background:var(--teal);}
   .ticket{
-    background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow);
+    background:var(--surface);border-radius:0;box-shadow:var(--shadow);
     display:flex;overflow:hidden;position:relative;
-    margin:0 0 12px;padding:12px;
+    margin:0 0 12px;padding:0;
   }
-  .ticket .poster{width:76px;min-width:76px;height:106px;border-radius:10px;background:var(--surface-2);object-fit:cover;}
-  .ticket .poster-ph{width:76px;min-width:76px;height:106px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:10px;text-align:center;}
+  .ticket .poster{width:84px;min-width:84px;align-self:stretch;border-radius:0;background:var(--surface-2);object-fit:cover;}
+  .ticket .poster-ph{width:84px;min-width:84px;align-self:stretch;border-radius:0;background:var(--surface-2);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:10px;text-align:center;}
   .ticket .perf{display:none;}
-  .ticket .body{flex:1;padding:0 0 0 12px;min-width:0;}
-  .ticket .check{margin:auto 0 auto 8px;}
+  .ticket .body{flex:1;padding:12px 12px;min-width:0;}
+  .ticket .check{margin:auto 12px auto 0;}
   .ticket .name-pill{
     display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--ink);border-radius:999px;
     padding:6px 12px;font-weight:800;font-size:13px;margin-bottom:10px;max-width:100%;
@@ -137,12 +137,12 @@
     letter-spacing:.03em;padding:5px 10px;border-radius:6px;margin-top:10px;
   }
   .ticket .check{
-    width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);
-    display:flex;align-items:center;justify-content:center;margin:auto 4px;cursor:pointer;flex-shrink:0;
-    font-size:15px;color:transparent;transition:.15s;
+    width:32px;height:32px;border-radius:50%;border:none;background:var(--surface-2);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+    font-size:15px;color:var(--ink-soft);transition:.15s;
   }
   .ticket .check:active{transform:scale(0.9);}
-  .ticket .check.done{background:var(--surface-2);border-color:var(--line);color:var(--ink);}
+  .ticket .check.done{background:var(--teal);color:#fff;}
   .ticket.uptodate .body .ep-code{color:var(--gold);}
   .ticket .uptodate-tag{font-size:12px;color:var(--gold);font-weight:800;}
   .empty-state{text-align:center;padding:48px 20px;color:var(--ink-soft);}
