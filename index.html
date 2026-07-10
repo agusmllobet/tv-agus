@@ -111,7 +111,7 @@
     text-transform:uppercase;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;
   }
   .toptab.active{color:var(--ink);border-bottom-color:var(--ink);}
-  .season-progress{height:3px;background:var(--surface-2);overflow:hidden;margin:0 0 0;}
+  .season-progress{height:3px;background:var(--surface-2);overflow:hidden;margin:0 -16px 0;}
   .season-progress .fill{height:100%;background:var(--teal);}
   .ticket{
     background:var(--surface);border-radius:0;box-shadow:var(--shadow);
@@ -164,26 +164,41 @@
   }
   .chip.active{background:var(--ink);color:var(--surface);border-color:var(--ink);}
   .detail-hero{
-    height:280px;background-size:cover;background-position:center;
+    height:170px;background-size:cover;background-position:center;
     position:relative;margin:0 -16px 0;display:flex;align-items:flex-end;overflow:hidden;
   }
   .detail-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(20,18,15,.75));}
-  .detail-hero .info{position:relative;padding:16px;color:#fff;z-index:1;}
-  .detail-hero .info h2{font-size:24px;color:#fff;}
-  .detail-hero .info .meta{font-size:13px;opacity:.85;margin-top:2px;}
+  .detail-hero .info{position:relative;padding:14px 16px;color:#fff;z-index:1;}
+  .detail-hero .info h2{font-size:20px;color:#fff;}
+  .detail-hero .info .meta{font-size:12.5px;opacity:.85;margin-top:2px;}
   .back-chevron{
     background:none;border:none;font-size:22px;font-weight:700;color:var(--ink);
     padding:8px 4px;cursor:pointer;margin-bottom:6px;
   }
-  .overall-progress{height:4px;background:var(--surface-2);margin:0 -16px 20px;}
-  .overall-progress .fill{height:100%;background:var(--ink);}
+  .detail-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin:0 -16px 16px;padding:0 16px;}
+  .detail-tab{
+    flex:1;text-align:center;padding:12px 4px 13px;font-size:13px;font-weight:800;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--ink-soft);cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;
+  }
+  .detail-tab.active{color:var(--ink);border-bottom-color:var(--ink);}
+  .continue-tracking-label{font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:10px;}
+  .continue-card{
+    background:var(--surface-2);border-radius:10px;padding:16px;text-align:center;margin-bottom:20px;
+  }
+  .continue-card .big{font-size:16px;font-weight:800;color:var(--gold);}
+  .continue-card .small{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .about-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .about-row .k{color:var(--ink-soft);}
+  .about-row .v{font-weight:700;}
+  .overall-progress{height:4px;margin:0 -16px 0;}
+  .overall-progress .fill{height:100%;width:100%;}
   .status-select{
     width:100%;padding:12px 4px;border:none;border-bottom:1px solid var(--line);background:none;
     font-size:16px;font-weight:700;margin-bottom:16px;color:var(--ink);
   }
   .season-row{
-    background:var(--surface);border-radius:12px;padding:13px 14px;margin-bottom:0;
-    display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+    background:var(--surface);border-radius:0;padding:14px 16px;margin:0 -16px 0;
+    display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-top:1px solid var(--line);
   }
   .season-row .left{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px;}
   .season-row .count{font-size:12.5px;color:var(--ink-soft);font-weight:600;}
@@ -192,9 +207,11 @@
     display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;flex-shrink:0;
   }
   .season-row.complete .mark-all{background:var(--teal);color:#fff;}
-  .season-row.complete{}
+  .season-block{margin-bottom:0;}
+  .season-block:last-child .season-progress{margin-bottom:16px;}
+
   .episode-row{
-    display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 -16px;border-bottom:1px solid var(--line);
   }
   .episode-row img{width:56px;height:56px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--surface-2);}
   .episode-row .ecode{font-weight:800;font-size:11.5px;color:var(--ink-soft);width:46px;flex-shrink:0;line-height:1.3;}
@@ -591,7 +608,7 @@ function bindWatchList(){
   document.querySelectorAll('[data-show]').forEach(el=>{
     el.onclick = (e)=>{
       if(e.target.closest('[data-mark-episode]')) return;
-      state.currentShowId = el.dataset.show; state.view = 'detail'; render();
+      state.currentShowId = el.dataset.show; state.view = 'detail'; detailTab='episodes'; render();
     };
   });
   document.querySelectorAll('[data-mark-episode]').forEach(el=>{
@@ -660,7 +677,7 @@ function bindLibrary(){
     el.onclick = ()=>{ state.libraryFilter = el.dataset.filter; render(); };
   });
   document.querySelectorAll('[data-show]').forEach(el=>{
-    el.onclick = ()=>{ state.currentShowId = el.dataset.show; state.view='detail'; render(); };
+    el.onclick = ()=>{ state.currentShowId = el.dataset.show; state.view='detail'; detailTab='episodes'; render(); };
   });
   document.querySelectorAll('[data-nav]').forEach(el=>{
     el.onclick = ()=>{ state.view = el.dataset.nav; render(); };
@@ -678,6 +695,7 @@ function bindLibrary(){
 }
 
 let openSeasons = new Set();
+let detailTab = 'episodes';
 
 function renderDetail(){
   const show = state.shows.find(s=>s.id===state.currentShowId);
@@ -697,64 +715,96 @@ function renderDetail(){
     seasons[key].push(e);
   }
   const seasonKeys = Object.keys(seasons).map(Number).sort((a,b)=>a-b);
+  const color = gridColorFor(show);
+  const info = nextEpisodeFor(show);
 
   const statusOptions = Object.entries(STATUS_LABELS).map(([v,l])=>
     `<option value="${v}" ${show.status===v?'selected':''}>${l}</option>`).join('');
 
-  let seasonsHtml = seasonKeys.map(sk=>{
-    const list = seasons[sk];
-    const watchedCount = list.filter(e=>watched.has(e.id)).length;
-    const complete = watchedCount === list.length;
-    const label = sk === 0 ? 'Specials' : `Season ${sk}`;
-    const isOpen = openSeasons.has(sk);
-    let episodesHtml = '';
-    if(isOpen){
-      episodesHtml = list.map(e=>{
-        const done = watched.has(e.id);
-        const code = sk===0 ? `SP${String(e.number||0).padStart(2,'0')}` : `S${String(sk).padStart(2,'0')} | E${String(e.number||0).padStart(2,'0')}`;
-        return `<div class="episode-row">
-          ${e.image?.medium ? `<img src="${e.image.medium}"/>` : ''}
-          <div class="ecode">${code}</div>
-          <div class="etitle">${escapeHtml(e.name||'Episodio')}</div>
-          <div class="echeck ${done?'done':''}" data-ep-toggle="${e.id}:${sk}:${e.number}">✓</div>
-        </div>`;
-      }).join('');
+  let continueCard = '';
+  if(!info.loading){
+    if(info.upToDate){
+      continueCard = `<div class="continue-card"><div class="big">Up to date</div><div class="small">More episodes to come!</div></div>`;
+    } else {
+      const ep = info.next;
+      const code = `S${String(ep.season).padStart(2,'0')} | E${String(ep.number||0).padStart(2,'0')}`;
+      continueCard = `<div class="continue-card" style="text-align:left;">
+        <div style="font-weight:800;font-size:15px;">${code}</div>
+        <div class="small">${escapeHtml(ep.name||'Episodio')}</div>
+      </div>`;
     }
-    return `
-    <div style="margin-bottom:10px;">
-      <div class="season-card" style="background:var(--surface);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;">
+  }
+
+  let episodesTabHtml = `
+    <div class="continue-tracking-label">Continue tracking</div>
+    ${continueCard}
+    ${seasonKeys.map(sk=>{
+      const list = seasons[sk];
+      const watchedCount = list.filter(e=>watched.has(e.id)).length;
+      const complete = watchedCount === list.length;
+      const label = sk === 0 ? 'Specials' : `Season ${sk}`;
+      const isOpen = openSeasons.has(sk);
+      let episodesHtml = '';
+      if(isOpen){
+        episodesHtml = list.map(e=>{
+          const done = watched.has(e.id);
+          const code = sk===0 ? `SP${String(e.number||0).padStart(2,'0')}` : `S${String(sk).padStart(2,'0')} | E${String(e.number||0).padStart(2,'0')}`;
+          return `<div class="episode-row">
+            ${e.image?.medium ? `<img src="${e.image.medium}"/>` : ''}
+            <div class="ecode">${code}</div>
+            <div class="etitle">${escapeHtml(e.name||'Episodio')}</div>
+            <div class="echeck ${done?'done':''}" data-ep-toggle="${e.id}:${sk}:${e.number}">✓</div>
+          </div>`;
+        }).join('');
+      }
+      return `
+      <div class="season-block">
         <div class="season-row ${complete?'complete':''}" data-season-toggle="${sk}">
           <div class="left">${label} <span class="count">${watchedCount}/${list.length}</span></div>
           <button class="mark-all" data-mark-season="${sk}" title="${complete? 'Desmarcar todo':'Marcar todo'}">✓</button>
         </div>
-        <div class="season-progress"><div class="fill" style="width:${list.length? Math.round(watchedCount/list.length*100):0}%"></div></div>
+        <div class="season-progress"><div class="fill" style="width:${list.length? Math.round(watchedCount/list.length*100):0}%;background:${complete?'var(--teal)':'var(--surface-2)'}"></div></div>
         ${episodesHtml}
-      </div>
-    </div>`;
-  }).join('');
+      </div>`;
+    }).join('')}
+    <div style="margin-top:20px;">
+      <button class="ghost-btn" id="mark-previous" style="width:100%;margin-bottom:10px;">Marcar todos los anteriores como vistos</button>
+      <select class="status-select" id="status-select" style="border:1px solid var(--line);border-radius:10px;padding:10px;">${statusOptions}</select>
+      <div class="danger-link" id="remove-show">Quitar esta serie de mi biblioteca</div>
+    </div>
+  `;
 
-  const totalEpisodes = eps.length;
-  const totalWatched = eps.filter(e=>watched.has(e.id)).length;
+  const aboutTabHtml = `
+    <div class="about-row"><span class="k">Estado</span><span class="v">${STATUS_LABELS[show.status]}</span></div>
+    <div class="about-row"><span class="k">Canal</span><span class="v">${escapeHtml(show.network||'—')}</span></div>
+    <div class="about-row"><span class="k">Estreno</span><span class="v">${show.premiered? show.premiered.slice(0,4) : '—'}</span></div>
+    <div class="about-row"><span class="k">Temporadas</span><span class="v">${seasonKeys.filter(k=>k>0).length}</span></div>
+  `;
 
   return `
     <div class="detail-hero" style="background-image:url('${show.image_url||''}')">
       <button class="back-chevron" data-back style="position:absolute;top:14px;left:4px;color:#fff;z-index:2;">‹</button>
       <div class="info">
         <h2>${escapeHtml(show.name)}</h2>
-        <div class="meta">${seasonKeys.length} temporada${seasonKeys.length!==1?'s':''}${show.network? ' · '+escapeHtml(show.network):''}</div>
+        <div class="meta">${seasonKeys.filter(k=>k>0).length} temporada${seasonKeys.filter(k=>k>0).length!==1?'s':''}${show.network? ' · '+escapeHtml(show.network):''}</div>
       </div>
     </div>
-    <div class="overall-progress"><div class="fill" style="width:${totalEpisodes? Math.round(totalWatched/totalEpisodes*100):0}%"></div></div>
-    <select class="status-select" id="status-select">${statusOptions}</select>
-    <button class="ghost-btn" id="mark-previous" style="width:100%;margin-bottom:14px;">Marcar todos los anteriores como vistos</button>
-    ${seasonsHtml}
-    <div class="danger-link" id="remove-show">Quitar esta serie de mi biblioteca</div>
+    <div class="overall-progress"><div class="fill st-${color}"></div></div>
+    <div class="detail-tabs">
+      <button class="detail-tab ${detailTab==='about'?'active':''}" data-detail-tab="about">About</button>
+      <button class="detail-tab ${detailTab==='episodes'?'active':''}" data-detail-tab="episodes">Episodes</button>
+    </div>
+    ${detailTab==='about' ? aboutTabHtml : episodesTabHtml}
   `;
 }
 
 function bindDetail(){
   document.querySelector('[data-back]').onclick = ()=>{ state.view = state._detailFrom || 'watchlist'; render(); };
   const show = state.shows.find(s=>s.id===state.currentShowId);
+
+  document.querySelectorAll('[data-detail-tab]').forEach(el=>{
+    el.onclick = ()=>{ detailTab = el.dataset.detailTab; render(); };
+  });
 
   document.querySelectorAll('[data-season-toggle]').forEach(el=>{
     el.onclick = ()=>{
@@ -787,7 +837,8 @@ function bindDetail(){
     };
   });
 
-  document.getElementById('mark-previous').onclick = async ()=>{
+  const markPrevBtn = document.getElementById('mark-previous');
+  if(markPrevBtn) markPrevBtn.onclick = async ()=>{
     const eps = state.episodeCache[show.id];
     const today = todayISO();
     const aired = eps.filter(e=>e.airdate && e.airdate<=today);
@@ -802,14 +853,16 @@ function bindDetail(){
     toast('Marcados como vistos');
   };
 
-  document.getElementById('status-select').onchange = async (e)=>{
+  const statusSelect = document.getElementById('status-select');
+  if(statusSelect) statusSelect.onchange = async (e)=>{
     const newStatus = e.target.value;
     await supabase.from('tvagus_shows').update({ status:newStatus, updated_at:new Date().toISOString() }).eq('id', show.id);
     show.status = newStatus;
     toast('Estado actualizado');
   };
 
-  document.getElementById('remove-show').onclick = async ()=>{
+  const removeBtn = document.getElementById('remove-show');
+  if(removeBtn) removeBtn.onclick = async ()=>{
     if(!confirm(`¿Quitar "${show.name}" de tu biblioteca? Se borra tu progreso de esta serie.`)) return;
     await supabase.from('tvagus_shows').delete().eq('id', show.id);
     state.shows = state.shows.filter(s=>s.id!==show.id);
@@ -914,6 +967,7 @@ async function addShowFlow(ds){
   state.currentShowId = data.id;
   state._detailFrom = 'search';
   state.view = 'detail';
+  detailTab = 'episodes';
   render();
 }
 
