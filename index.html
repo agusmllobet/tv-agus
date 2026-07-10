@@ -148,15 +148,15 @@
   .empty-state{text-align:center;padding:48px 20px;color:var(--ink-soft);}
   .empty-state .display{font-size:19px;color:var(--ink);margin-bottom:6px;}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-  .grid-card{border-radius:12px;overflow:hidden;position:relative;aspect-ratio:2/3;background:var(--surface-2);cursor:pointer;}
+  .grid-card{border-radius:0;overflow:hidden;position:relative;aspect-ratio:2/3;background:var(--surface-2);cursor:pointer;}
   .grid-card img{width:100%;height:100%;object-fit:cover;display:block;}
   .grid-card .no-img{display:flex;align-items:center;justify-content:center;height:100%;font-size:11px;color:var(--ink-soft);text-align:center;padding:8px;}
   .grid-card .statusbar{position:absolute;bottom:0;left:0;right:0;height:5px;}
-  .st-watching{background:#4C9A82;}
-  .st-plan_to_watch{background:#D9A441;}
-  .st-paused{background:#9A7FBF;}
-  .st-dropped{background:#B23A3A;}
-  .st-completed{background:#3E6FA6;}
+  .st-green{background:#3FB871;}
+  .st-yellow{background:#E8B923;}
+  .st-gray{background:#9AA0A6;}
+  .st-purple{background:#7B4FB0;}
+  .st-red{background:#C0392B;}
   .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
   .chip{
     border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;
@@ -637,11 +637,20 @@ function renderLibrary(){
   const cards = shown.map(s=>`
     <div class="grid-card" data-show="${s.id}">
       ${s.image_url ? `<img src="${s.image_url}" alt="${escapeHtml(s.name)}"/>` : `<div class="no-img">${escapeHtml(s.name)}</div>`}
-      <div class="statusbar st-${s.status}"></div>
+      <div class="statusbar st-${gridColorFor(s)}"></div>
     </div>
   `).join('');
 
   return `<div class="filter-row">${chips}</div>${importLink}<div class="grid">${cards}</div>`;
+}
+
+function gridColorFor(show){
+  if(show.status === 'dropped') return 'red';
+  if(show.status === 'completed') return 'purple';
+  if(show.status === 'paused') return 'gray';
+  const info = nextEpisodeFor(show);
+  if(info.loading) return 'gray';
+  return info.upToDate ? 'green' : 'yellow';
 }
 
 function bindLibrary(){
