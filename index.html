@@ -292,9 +292,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const STATUS_LABELS = {
   watching: 'Viendo',
-  paused: 'Pausada',
-  dropped: 'Abandonada',
-  completed: 'Completada'
+  dropped: 'Abandonada'
 };
 
 let state = {
@@ -431,9 +429,10 @@ function render(){
   else if(state.view === 'search') body = renderSearch();
   else if(state.view === 'import') body = renderImport();
 
+  const icoLogo = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l2 2M16 3l-2 2"/><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M10 10.2l5 2.3-5 2.3z" fill="#fff" stroke="none"/></svg>`;
   app.innerHTML = `
     <div class="topbar">
-      <h1>TV agus!</h1>
+      <h1>${icoLogo}tv agus!</h1>
       <button class="icon-btn" id="btn-refresh" title="Actualizar">↻</button>
     </div>
     <div class="content">${body}</div>
@@ -470,7 +469,7 @@ function bindGlobal(){
 function renderLogin(){
   return `
   <div class="login-wrap">
-    <div class="display">TV agus!</div>
+    <div class="display" style="display:flex;align-items:center;justify-content:center;gap:8px;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l2 2M16 3l-2 2"/><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M10 10.2l5 2.3-5 2.3z" fill="var(--ink)" stroke="none"/></svg>tv agus!</div>
     <div class="sub">Ingresá tu PIN</div>
     <input type="password" inputmode="numeric" maxlength="6" class="pin-input" id="pin-field" placeholder="••••••" autofocus autocomplete="off" />
     <div class="error-text" id="pin-error"></div>
@@ -511,7 +510,7 @@ async function afterLogin(){
 
 async function preloadEpisodeCaches(){
   for(const show of state.shows){
-    if(show.status === 'watching' || show.status === 'paused'){
+    if(show.status === 'watching'){
       await loadEpisodeCache(show.id, show.tvmaze_id);
       if(state.view === 'watchlist') render();
     }
@@ -529,7 +528,7 @@ function renderWatchList(){
     return tabsHtml + renderUpcomingTab();
   }
 
-  const active = state.shows.filter(s => ['watching','paused'].includes(s.status));
+  const active = state.shows.filter(s => s.status === 'watching');
   if(active.length === 0){
     return tabsHtml + `<div class="empty-state"><div class="display">Tu cartelera está vacía</div>
       <p>Agregá series desde "Buscar" o importá tu historial de TV Time.</p>
@@ -585,7 +584,7 @@ function renderWatchList(){
 }
 
 function renderUpcomingTab(){
-  const active = state.shows.filter(s => ['watching','paused'].includes(s.status));
+  const active = state.shows.filter(s => s.status === 'watching');
   const upcoming = [];
   for(const s of active){
     const eps = state.episodeCache[s.id];
@@ -652,9 +651,11 @@ async function markEpisodeWatched(showId, tvmazeEpisodeId, seasonNumber=null, ep
 }
 
 function renderLibrary(){
-  const filters = ['all','watching','paused','dropped','completed'];
-  const filterLabel = { all:'Todas', ...STATUS_LABELS };
-  let shown = state.libraryFilter === 'all' ? state.shows : state.shows.filter(s=>s.status===state.libraryFilter);
+  const filters = ['all','watching','dropped','completed'];
+  const filterLabel = { all:'Todas', ...STATUS_LABELS, completed:'Completada' };
+  let shown = state.libraryFilter === 'all' ? state.shows
+    : state.libraryFilter === 'completed' ? state.shows.filter(s=>gridColorFor(s)==='purple')
+    : state.shows.filter(s=>s.status===state.libraryFilter);
   const q = (state.libraryQuery||'').trim().toLowerCase();
   if(q) shown = shown.filter(s => s.name.toLowerCase().includes(q));
 
@@ -677,10 +678,9 @@ function renderLibrary(){
 
 function gridColorFor(show){
   if(show.status === 'dropped') return 'red';
-  if(show.status === 'completed') return 'purple';
-  if(show.status === 'paused') return 'gray';
   const info = nextEpisodeFor(show);
   if(info.loading) return 'gray';
+  if(show.ended && info.upToDate) return 'purple';
   return info.upToDate ? 'green' : 'yellow';
 }
 
@@ -790,7 +790,7 @@ function renderDetail(){
   `;
 
   const aboutTabHtml = `
-    <div class="about-row"><span class="k">Estado</span><span class="v">${STATUS_LABELS[show.status]}</span></div>
+    <div class="about-row"><span class="k">Estado</span><span class="v">${show.ended && info.upToDate ? 'Completada' : STATUS_LABELS[show.status]}</span></div>
     <div class="about-row"><span class="k">Canal</span><span class="v">${escapeHtml(show.network||'—')}</span></div>
     <div class="about-row"><span class="k">Estreno</span><span class="v">${show.premiered? show.premiered.slice(0,4) : '—'}</span></div>
     <div class="about-row"><span class="k">Temporadas</span><span class="v">${seasonKeys.filter(k=>k>0).length}</span></div>
@@ -916,7 +916,7 @@ function bindSearch(){
       results.innerHTML = `<div class="spinner"></div>`;
       const shows = await tvmazeSearch(q);
       results.innerHTML = shows.map(s=>`
-        <div class="result-row" data-view="${s.id}" data-name="${escapeHtml(s.name)}" data-img="${s.image?.medium||''}" data-network="${escapeHtml(s.network?.name || s.webChannel?.name || '')}" data-premiered="${s.premiered||''}">
+        <div class="result-row" data-view="${s.id}" data-name="${escapeHtml(s.name)}" data-img="${s.image?.medium||''}" data-network="${escapeHtml(s.network?.name || s.webChannel?.name || '')}" data-premiered="${s.premiered||''}" data-status="${s.status||''}">
           <img src="${s.image?.medium||''}" />
           <div>
             <div class="rname">${escapeHtml(s.name)}</div>
@@ -935,7 +935,7 @@ let searchPreview = null;
 
 async function openSearchPreview(ds){
   const tvmazeId = parseInt(ds.view);
-  searchPreview = { tvmazeId, name: ds.name, img: ds.img, network: ds.network, premiered: ds.premiered, episodes: null };
+  searchPreview = { tvmazeId, name: ds.name, img: ds.img, network: ds.network, premiered: ds.premiered, tvStatus: ds.status, episodes: null };
   renderSearchPreviewModal();
   const eps = await tvmazeEpisodes(tvmazeId);
   if(searchPreview) { searchPreview.episodes = eps; renderSearchPreviewModal(); }
@@ -967,7 +967,7 @@ function renderSearchPreviewModal(){
   `;
   document.getElementById('cancel-add-btn').onclick = ()=>{ searchPreview=null; renderSearchPreviewModal(); };
   document.getElementById('confirm-add-btn').onclick = async ()=>{
-    await addShowFlow({ add: searchPreview.tvmazeId, name: searchPreview.name, img: searchPreview.img, network: searchPreview.network, premiered: searchPreview.premiered });
+    await addShowFlow({ add: searchPreview.tvmazeId, name: searchPreview.name, img: searchPreview.img, network: searchPreview.network, premiered: searchPreview.premiered, status: searchPreview.tvStatus });
     searchPreview = null;
     renderSearchPreviewModal();
   };
@@ -983,6 +983,7 @@ async function addShowFlow(ds){
     image_url: ds.img || null,
     network: ds.network || null,
     premiered: ds.premiered || null,
+    ended: ds.status === 'Ended',
     status: 'watching'
   }).select().single();
   if(error){ toast('Error al agregar'); console.error(error); return; }
@@ -1126,7 +1127,8 @@ async function runImport(file){
       image_url: tvmazeShow.image?.medium || null,
       network: tvmazeShow.network?.name || tvmazeShow.webChannel?.name || null,
       premiered: tvmazeShow.premiered || null,
-      status: needsReview ? 'paused' : suggestedStatus
+      ended: tvmazeShow.status === 'Ended',
+      status: needsReview ? 'dropped' : suggestedStatus
     }).select().single();
 
     if(error || !insertedShow) return;
@@ -1204,9 +1206,7 @@ function renderImportReview(){
         ` : `
           <select class="review-status" data-review-status="${it.id}">
             <option value="watching">Viendo</option>
-            <option value="paused">Pausada</option>
             <option value="dropped" selected>Abandonada</option>
-            <option value="completed">Completada</option>
           </select>
           <button class="primary-btn" data-resolve-status="${it.id}" style="width:100%;">Confirmar</button>
         `}
@@ -1228,7 +1228,7 @@ function bindImportReviewIfPresent(){
       t = setTimeout(async ()=>{
         const shows = await tvmazeSearch(q);
         resultsEl.innerHTML = shows.slice(0,5).map(s=>`
-          <div class="result-row" data-review-pick="${el.dataset.reviewSearch}" data-pick-id="${s.id}" data-pick-name="${escapeHtml(s.name)}" data-pick-img="${s.image?.medium||''}" data-pick-network="${escapeHtml(s.network?.name||'')}">
+          <div class="result-row" data-review-pick="${el.dataset.reviewSearch}" data-pick-id="${s.id}" data-pick-name="${escapeHtml(s.name)}" data-pick-img="${s.image?.medium||''}" data-pick-network="${escapeHtml(s.network?.name||'')}" data-pick-status="${s.status||''}">
             <img src="${s.image?.medium||''}"/>
             <div><div class="rname">${escapeHtml(s.name)}</div><div class="rmeta">${s.premiered?s.premiered.slice(0,4):''}</div></div>
           </div>
@@ -1268,7 +1268,7 @@ async function resolveNotFound(ds){
   const eps = await tvmazeEpisodes(parseInt(ds.pickId));
   const { data: show } = await supabase.from('tvagus_shows').insert({
     user_id: state.user.id, tvmaze_id: parseInt(ds.pickId), name: ds.pickName,
-    image_url: ds.pickImg||null, network: ds.pickNetwork||null, status: item.suggested_status || 'watching'
+    image_url: ds.pickImg||null, network: ds.pickNetwork||null, ended: ds.pickStatus === 'Ended', status: item.suggested_status || 'watching'
   }).select().single();
   if(show){
     await supabase.from('tvagus_episode_cache').upsert({ show_id: show.id, user_id: state.user.id, episodes: eps, fetched_at:new Date().toISOString() });
