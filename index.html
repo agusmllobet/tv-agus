@@ -405,7 +405,7 @@ function render(){
   app.innerHTML = `
     <div class="topbar">
       <h1>TV agus!</h1>
-      <button class="icon-btn" id="btn-export" title="Exportar mis datos">⇩</button>
+      <button class="icon-btn" id="btn-refresh" title="Actualizar">↻</button>
     </div>
     <div class="content">${body}</div>
     ${renderBottomNav()}
@@ -434,8 +434,8 @@ function bindGlobal(){
   document.querySelectorAll('[data-nav]').forEach(b=>{
     b.onclick = ()=>{ state.view = b.dataset.nav; render(); };
   });
-  const exportBtn = document.getElementById('btn-export');
-  if(exportBtn) exportBtn.onclick = exportMyData;
+  const refreshBtn = document.getElementById('btn-refresh');
+  if(refreshBtn) refreshBtn.onclick = ()=>{ location.href = location.pathname + '?t=' + Date.now(); };
 }
 
 function renderLogin(){
