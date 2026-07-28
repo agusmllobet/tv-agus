@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>TV agus!</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23A6323A%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22%23FAF7F1%22 font-family=%22Georgia%22>tv</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%234A3AA8%22/><text x=%2250%22 y=%2266%22 font-size=%2255%22 text-anchor=%22middle%22 fill=%22%23FFFFFF%22 font-family=%22Arial%22>tv</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -46,9 +46,7 @@
   .mono{font-family:'Inter',sans-serif;font-weight:700;}
   button{font-family:inherit;}
   a{color:inherit;}
-
   #app{max-width:640px;margin:0 auto;min-height:100vh;position:relative;}
-
   .topbar{
     position:sticky;top:0;z-index:20;
     background:linear-gradient(135deg,#4A3AA8,#6B54D6);
@@ -63,9 +61,7 @@
     display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;
   }
   .icon-btn:active{transform:scale(0.94);}
-
   .content{padding:16px 16px 32px;}
-
   .bottomnav{
     position:fixed;bottom:0;left:0;right:0;z-index:30;
     background:rgba(255,255,255,0.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
@@ -78,7 +74,6 @@
   }
   .navbtn.active{color:var(--accent);}
   .navbtn .ic{display:block;margin:0 auto;}
-
   .login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
   .login-wrap .display{font-size:32px;margin-bottom:6px;font-weight:900;}
   .login-wrap .sub{color:var(--ink-soft);margin-bottom:26px;font-size:14px;font-weight:500;}
@@ -99,7 +94,6 @@
     font-size:14px;font-weight:700;cursor:pointer;color:var(--ink);
   }
   .error-text{color:var(--danger);font-size:13px;margin-top:8px;min-height:18px;font-weight:600;}
-
   .marquee-label{
     display:flex;justify-content:center;margin:22px 0 14px;
   }
@@ -108,7 +102,6 @@
     background:var(--surface-2);color:var(--ink-soft);font-size:12px;font-weight:800;
     letter-spacing:.04em;text-transform:uppercase;padding:8px 18px;border-radius:999px;
   }
-
   .toptabs{
     display:flex;gap:0;border-bottom:1px solid var(--line);margin:-16px -16px 16px;padding:0 16px;
     position:sticky;top:66px;z-index:15;background:var(--bg);
@@ -118,10 +111,8 @@
     text-transform:uppercase;color:var(--ink-soft);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;
   }
   .toptab.active{color:var(--ink);border-bottom-color:var(--ink);}
-
   .season-progress{height:3px;background:var(--surface-2);overflow:hidden;margin:0;}
   .season-progress .fill{height:100%;background:var(--teal);}
-
   .ticket{
     background:var(--surface);border-radius:0;box-shadow:var(--shadow);
     display:flex;overflow:hidden;position:relative;
@@ -154,12 +145,8 @@
   .ticket .check.done{background:var(--teal);color:#fff;}
   .ticket.uptodate .body .ep-code{color:var(--gold);}
   .ticket .uptodate-tag{font-size:12px;color:var(--gold);font-weight:800;}
-
-  .empty-state{
-    text-align:center;padding:48px 20px;color:var(--ink-soft);
-  }
+  .empty-state{text-align:center;padding:48px 20px;color:var(--ink-soft);}
   .empty-state .display{font-size:19px;color:var(--ink);margin-bottom:6px;}
-
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
   .grid-card{border-radius:0;overflow:hidden;position:relative;aspect-ratio:2/3;background:var(--surface-2);cursor:pointer;}
   .grid-card img{width:100%;height:100%;object-fit:cover;display:block;}
@@ -170,14 +157,12 @@
   .st-gray{background:#9AA0A6;}
   .st-purple{background:#7B4FB0;}
   .st-red{background:#C0392B;}
-
   .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
   .chip{
     border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;
     font-size:12.5px;cursor:pointer;color:var(--ink-soft);font-weight:600;
   }
   .chip.active{background:var(--ink);color:var(--surface);border-color:var(--ink);}
-
   .detail-hero{
     height:170px;background-size:cover;background-position:center;
     position:relative;margin:0 -16px 0;display:flex;align-items:flex-end;overflow:hidden;
@@ -220,12 +205,10 @@
   .about-row .v{font-weight:700;}
   .overall-progress{height:4px;margin:0 -16px 0;}
   .overall-progress .fill{height:100%;width:100%;}
-
   .status-select{
     width:100%;padding:12px 4px;border:none;border-bottom:1px solid var(--line);background:none;
     font-size:16px;font-weight:700;margin-bottom:16px;color:var(--ink);
   }
-
   .season-row{
     background:var(--surface);border-radius:8px 8px 0 0;padding:14px 16px;margin:0;
     display:flex;align-items:center;justify-content:space-between;cursor:pointer;
@@ -237,10 +220,13 @@
     display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;flex-shrink:0;
   }
   .season-row.complete .mark-all{background:var(--teal);color:#fff;}
-  .season-block{margin-bottom:10px;box-shadow:var(--shadow);border-radius:6px;overflow:hidden;background:var(--surface);}
+  .season-block{margin-bottom:16px;}
+  .season-header-card{box-shadow:var(--shadow);border-radius:8px;overflow:hidden;background:var(--surface);margin-bottom:8px;}
+  .season-header-card .season-row{border-radius:0;}
 
   .episode-row{
-    display:flex;align-items:stretch;gap:12px;padding:0;margin:0;border-top:1px solid var(--line);
+    display:flex;align-items:stretch;gap:12px;padding:0;margin:0 0 8px;border-radius:10px;overflow:hidden;
+    box-shadow:var(--shadow);background:var(--surface);
   }
   .episode-row img{width:100px;align-self:stretch;border-radius:0;object-fit:cover;flex-shrink:0;background:var(--surface-2);}
   .episode-row .etext{flex:1;min-width:0;padding:10px 12px 10px 0;}
@@ -255,7 +241,6 @@
 
   .action-row{display:flex;gap:8px;margin-top:18px;}
   .danger-link{color:var(--danger);font-size:13px;text-align:center;margin-top:20px;cursor:pointer;text-decoration:underline;}
-
   .search-box{
     display:flex;gap:8px;margin-bottom:16px;position:sticky;top:70px;background:var(--bg);padding-bottom:8px;z-index:10;
   }
@@ -269,7 +254,6 @@
   .result-row img{width:52px;height:74px;object-fit:cover;border-radius:8px;background:var(--surface-2);}
   .result-row .rname{font-weight:700;font-size:14.5px;}
   .result-row .rmeta{font-size:12px;color:var(--ink-soft);}
-
   .import-drop{
     border:2px dashed var(--line);border-radius:var(--radius-lg);padding:36px 20px;text-align:center;
     color:var(--ink-soft);cursor:pointer;background:var(--surface);
@@ -282,20 +266,17 @@
   .review-card select, .review-card input{
     width:100%;padding:9px;border-radius:8px;border:1px solid var(--line);margin-bottom:8px;font-size:16px;
   }
-
   .toast{
     position:fixed;bottom:96px;left:50%;transform:translateX(-50%);
     background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13.5px;
     z-index:100;opacity:0;transition:opacity .2s;pointer-events:none;
   }
   .toast.show{opacity:1;}
-
   .spinner{
     width:22px;height:22px;border-radius:50%;border:3px solid var(--surface-2);border-top-color:var(--accent);
     animation:spin .7s linear infinite;margin:20px auto;
   }
   @keyframes spin{to{transform:rotate(360deg);}}
-
   ::-webkit-scrollbar{width:0;height:0;}
   :focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
@@ -314,6 +295,26 @@ const AUTH_EMAIL = 'agus_mllobet@hotmail.com';
 const TVMAZE = 'https://api.tvmaze.com';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function ensureFreshSession(){
+  try{
+    const { data: { session } } = await supabase.auth.getSession();
+    if(!session) return false;
+    const now = Math.floor(Date.now()/1000);
+    if(!session.expires_at || session.expires_at - now < 300){
+      const { error } = await supabase.auth.refreshSession();
+      if(error) return false;
+    }
+    return true;
+  }catch(e){ return false; }
+}
+
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible' && state.user){
+    ensureFreshSession();
+  }
+});
+setInterval(()=>{ if(state.user) ensureFreshSession(); }, 4*60*1000);
 
 const STATUS_LABELS = {
   watching: 'Viendo',
@@ -684,17 +685,35 @@ function bindWatchList(){
 
 async function markEpisodeWatched(showId, tvmazeEpisodeId, seasonNumber=null, episodeNumber=null){
   if(!state.watchedMap[showId]) state.watchedMap[showId] = new Set();
-  if(state.watchedMap[showId].has(tvmazeEpisodeId)){
-    state.watchedMap[showId].delete(tvmazeEpisodeId);
-    await supabase.from('tvagus_watched_episodes').delete()
-      .eq('show_id', showId).eq('tvmaze_episode_id', tvmazeEpisodeId);
-  } else {
-    state.watchedMap[showId].add(tvmazeEpisodeId);
-    await supabase.from('tvagus_watched_episodes').insert({
+  const wasWatched = state.watchedMap[showId].has(tvmazeEpisodeId);
+
+  if(wasWatched){ state.watchedMap[showId].delete(tvmazeEpisodeId); }
+  else { state.watchedMap[showId].add(tvmazeEpisodeId); }
+
+  async function doWrite(){
+    if(wasWatched){
+      return await supabase.from('tvagus_watched_episodes').delete()
+        .eq('show_id', showId).eq('tvmaze_episode_id', tvmazeEpisodeId);
+    }
+    return await supabase.from('tvagus_watched_episodes').insert({
       show_id: showId, user_id: state.user.id, tvmaze_episode_id: tvmazeEpisodeId,
       season_number: seasonNumber, episode_number: episodeNumber
     });
   }
+
+  let { error } = await doWrite();
+  if(error){
+    await ensureFreshSession();
+    ({ error } = await doWrite());
+  }
+  if(error){
+    if(wasWatched){ state.watchedMap[showId].add(tvmazeEpisodeId); }
+    else { state.watchedMap[showId].delete(tvmazeEpisodeId); }
+    toast('No se pudo guardar, probá de nuevo');
+    render();
+    return;
+  }
+
   await supabase.from('tvagus_shows').update({ updated_at: new Date().toISOString() }).eq('id', showId);
   const s = state.shows.find(s=>s.id===showId);
   if(s) s.updated_at = new Date().toISOString();
@@ -826,11 +845,13 @@ function renderDetail(){
       }
       return `
       <div class="season-block">
-        <div class="season-row ${complete?'complete':''}" data-season-toggle="${sk}">
-          <div class="left">${label} <span class="count">${watchedCount}/${list.length}</span></div>
-          <button class="mark-all" data-mark-season="${sk}" title="${complete? 'Desmarcar todo':'Marcar todo'}">✓</button>
+        <div class="season-header-card">
+          <div class="season-row ${complete?'complete':''}" data-season-toggle="${sk}">
+            <div class="left">${label} <span class="count">${watchedCount}/${list.length}</span></div>
+            <button class="mark-all" data-mark-season="${sk}" title="${complete? 'Desmarcar todo':'Marcar todo'}">✓</button>
+          </div>
+          <div class="season-progress"><div class="fill" style="width:${list.length? Math.round(watchedCount/list.length*100):0}%;background:${COLOR_HEX[color]}"></div></div>
         </div>
-        <div class="season-progress"><div class="fill" style="width:${list.length? Math.round(watchedCount/list.length*100):0}%;background:${COLOR_HEX[color]}"></div></div>
         ${episodesHtml}
       </div>`;
     }).join('')}
