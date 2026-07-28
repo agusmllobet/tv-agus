@@ -745,10 +745,10 @@ async function markEpisodeWatched(showId, tvmazeEpisodeId, seasonNumber=null, ep
       return await supabase.from('tvagus_watched_episodes').delete()
         .eq('show_id', showId).eq('tvmaze_episode_id', tvmazeEpisodeId);
     }
-    return await supabase.from('tvagus_watched_episodes').insert({
+    return await supabase.from('tvagus_watched_episodes').upsert({
       show_id: showId, user_id: state.user.id, tvmaze_episode_id: tvmazeEpisodeId,
       season_number: seasonNumber, episode_number: episodeNumber
-    });
+    }, { onConflict: 'show_id,tvmaze_episode_id' });
   }
 
   let error = null;
