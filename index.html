@@ -364,7 +364,7 @@ async function tvmazeSearch(query){
 async function tvmazeShowInfo(showId){
   try{
     const r = await fetch(`${TVMAZE}/shows/${showId}?embed=cast`);
-    if(!r.ok) return { summary:'', cast:[] };
+    if(!r.ok) return { summary:'', cast:[], ended:null };
     const data = await r.json();
     const summary = (data.summary||'').replace(/<[^>]*>/g,'');
     const cast = (data._embedded?.cast||[]).map(c=>({
@@ -372,8 +372,8 @@ async function tvmazeShowInfo(showId){
       character: c.character?.name || '',
       image: c.person?.image?.medium || ''
     }));
-    return { summary, cast };
-  }catch(e){ return { summary:'', cast:[] }; }
+    return { summary, cast, ended: data.status === 'Ended' };
+  }catch(e){ return { summary:'', cast:[], ended:null }; }
 }
 
 async function loadShowInfo(showId, tvmazeId){
@@ -566,6 +566,36 @@ async function preloadEpisodeCaches(){
       if(state.view === 'watchlist') render();
     }
   }
+  backfillEndedStatus();
+}
+
+async function tvmazeIsEnded(tvmazeId){
+  try{
+    const r = await fetch(`${TVMAZE}/shows/${tvmazeId}`);
+    if(!r.ok) return null;
+    const data = await r.json();
+    return data.status === 'Ended';
+  }catch(e){ return null; }
+}
+
+async function backfillEndedStatus(){
+  const candidates = state.shows.filter(s => !s.ended);
+  const CONCURRENCY = 5;
+  let idx = 0;
+  let anyChanged = false;
+  async function worker(){
+    while(idx < candidates.length){
+      const show = candidates[idx++];
+      const ended = await tvmazeIsEnded(show.tvmaze_id);
+      if(ended === true){
+        show.ended = true;
+        await supabase.from('tvagus_shows').update({ ended: true }).eq('id', show.id);
+        anyChanged = true;
+      }
+    }
+  }
+  await Promise.all(Array.from({length:CONCURRENCY}, worker));
+  if(anyChanged && (state.view==='watchlist' || state.view==='library')) render();
 }
 
 function renderWatchList(){
@@ -871,7 +901,13 @@ function renderDetail(){
   let synopsisHtml = '';
   let castHtml = '';
   if(!showInfo){
-    loadShowInfo(show.id, show.tvmaze_id).then(()=>{ if(state.view==='detail' && detailTab==='about') render(); });
+    loadShowInfo(show.id, show.tvmaze_id).then((loadedInfo)=>{
+      if(loadedInfo.ended !== null && loadedInfo.ended !== show.ended){
+        show.ended = loadedInfo.ended;
+        supabase.from('tvagus_shows').update({ ended: loadedInfo.ended }).eq('id', show.id);
+      }
+      if(state.view==='detail') render();
+    });
     synopsisHtml = `<div class="spinner"></div>`;
   } else {
     synopsisHtml = showInfo.summary ? `<p style="font-size:14px;line-height:1.5;color:var(--ink);margin:16px 0;">${escapeHtml(showInfo.summary)}</p>` : '';
