@@ -151,7 +151,8 @@
   .grid-card{border-radius:0;overflow:hidden;position:relative;aspect-ratio:2/3;background:var(--surface-2);cursor:pointer;}
   .grid-card img{width:100%;height:100%;object-fit:cover;display:block;}
   .grid-card .no-img{display:flex;align-items:center;justify-content:center;height:100%;font-size:11px;color:var(--ink-soft);text-align:center;padding:8px;}
-  .grid-card .statusbar{position:absolute;bottom:0;left:0;right:0;height:5px;}
+  .grid-card .statusbar{position:absolute;bottom:0;left:0;right:0;height:5px;background:rgba(0,0,0,0.08);}
+  .grid-card .statusbar .fill{height:100%;}
   .st-green{background:#3FB871;}
   .st-yellow{background:#E8B923;}
   .st-gray{background:#9AA0A6;}
@@ -792,7 +793,7 @@ function renderLibrary(){
   const cards = shown.map(s=>`
     <div class="grid-card" data-show="${s.id}">
       ${s.image_url ? `<img src="${s.image_url}" alt="${escapeHtml(s.name)}"/>` : `<div class="no-img">${escapeHtml(s.name)}</div>`}
-      <div class="statusbar st-${gridColorFor(s)}"></div>
+      <div class="statusbar"><div class="fill st-${gridColorFor(s)}" style="width:${watchProgressPercent(s)}%"></div></div>
     </div>
   `).join('');
 
@@ -805,6 +806,14 @@ function gridColorFor(show){
   if(info.loading) return 'gray';
   if(show.ended && info.upToDate) return 'purple';
   return info.upToDate ? 'green' : 'yellow';
+}
+
+function watchProgressPercent(show){
+  if(show.status === 'dropped') return 100;
+  const info = nextEpisodeFor(show);
+  if(info.loading) return 100;
+  if(!info.totalAired) return 0;
+  return Math.round((info.watchedAiredCount / info.totalAired) * 100);
 }
 
 function bindLibrary(){
