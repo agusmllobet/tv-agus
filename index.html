@@ -786,6 +786,7 @@ function renderLibrary(){
   const filterLabel = { all:'Todas', ...STATUS_LABELS, completed:'Completada' };
   let shown = state.libraryFilter === 'all' ? state.shows
     : state.libraryFilter === 'completed' ? state.shows.filter(s=>gridColorFor(s)==='purple')
+    : state.libraryFilter === 'watching' ? state.shows.filter(s=>s.status==='watching' && gridColorFor(s)!=='purple')
     : state.shows.filter(s=>s.status===state.libraryFilter);
   const q = (state.libraryQuery||'').trim().toLowerCase();
   if(q) shown = shown.filter(s => s.name.toLowerCase().includes(q));
