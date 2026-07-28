@@ -225,11 +225,11 @@
   .season-header-card .season-row{border-radius:0;}
 
   .episode-row{
-    display:flex;align-items:stretch;gap:12px;padding:0;margin:0 0 8px;border-radius:10px;overflow:hidden;
-    box-shadow:var(--shadow);background:var(--surface);
+    display:flex;align-items:stretch;gap:12px;padding:0;margin:0 0 10px;border-radius:0;overflow:hidden;
+    box-shadow:var(--shadow);background:var(--surface);min-height:110px;cursor:pointer;
   }
-  .episode-row img{width:100px;align-self:stretch;border-radius:0;object-fit:cover;flex-shrink:0;background:var(--surface-2);}
-  .episode-row .etext{flex:1;min-width:0;padding:10px 12px 10px 0;}
+  .episode-row img{width:110px;height:110px;align-self:center;border-radius:0;object-fit:cover;flex-shrink:0;background:var(--surface-2);}
+  .episode-row .etext{flex:1;min-width:0;padding:10px 12px 10px 0;align-self:center;}
   .episode-row .echeck{margin:auto 12px auto 0;}
   .episode-row .ecode{font-weight:800;font-size:16px;color:var(--ink);line-height:1.2;}
   .episode-row .etitle{font-size:14.5px;font-weight:500;color:var(--ink);min-width:0;white-space:normal;line-height:1.3;margin-top:2px;}
@@ -359,6 +359,26 @@ async function tvmazeSearch(query){
   if(!r.ok) return [];
   const data = await r.json();
   return data.map(d => d.show);
+}
+
+async function tvmazeEpisodeInfo(episodeId){
+  try{
+    const r = await fetch(`${TVMAZE}/episodes/${episodeId}?embed=guestcast`);
+    if(!r.ok) return null;
+    const data = await r.json();
+    const summary = (data.summary||'').replace(/<[^>]*>/g,'');
+    const guestcast = (data._embedded?.guestcast||[]).map(c=>({
+      name: c.person?.name || '',
+      character: c.character?.name || ''
+    }));
+    return {
+      name: data.name || 'Episodio',
+      image: data.image?.original || data.image?.medium || '',
+      summary,
+      airdate: data.airdate || '',
+      guestcast
+    };
+  }catch(e){ return null; }
 }
 
 async function tvmazeShowInfo(showId){
@@ -731,10 +751,14 @@ async function markEpisodeWatched(showId, tvmazeEpisodeId, seasonNumber=null, ep
     });
   }
 
-  let { error } = await doWrite();
-  if(error){
-    await ensureFreshSession();
+  let error = null;
+  for(let attempt=0; attempt<3; attempt++){
+    if(attempt > 0){
+      await ensureFreshSession();
+      await new Promise(r=>setTimeout(r, 300*attempt));
+    }
     ({ error } = await doWrite());
+    if(!error) break;
   }
   if(error){
     if(wasWatched){ state.watchedMap[showId].add(tvmazeEpisodeId); }
@@ -863,7 +887,7 @@ function renderDetail(){
         episodesHtml = list.map(e=>{
           const done = watched.has(e.id);
           const code = sk===0 ? `SP${String(e.number||0).padStart(2,'0')}` : `S${String(sk).padStart(2,'0')} | E${String(e.number||0).padStart(2,'0')}`;
-          return `<div class="episode-row">
+          return `<div class="episode-row" data-episode-view="${e.id}">
             ${e.image?.medium ? `<img src="${e.image.medium}"/>` : ''}
             <div class="etext">
               <div class="ecode">${code}</div>
@@ -995,11 +1019,16 @@ function bindDetail(){
   });
 
   document.querySelectorAll('[data-ep-toggle]').forEach(el=>{
-    el.onclick = async ()=>{
+    el.onclick = async (e)=>{
+      e.stopPropagation();
       const [id, season, number] = el.dataset.epToggle.split(':');
       await markEpisodeWatched(show.id, parseInt(id), parseInt(season), parseInt(number));
       render();
     };
+  });
+
+  document.querySelectorAll('[data-episode-view]').forEach(el=>{
+    el.onclick = ()=>{ openEpisodeDetail(parseInt(el.dataset.episodeView)); };
   });
 
   const markPrevBtn = document.getElementById('mark-previous');
@@ -1070,6 +1099,61 @@ function bindSearch(){
       });
     }, 400);
   });
+}
+
+let episodeDetail = null;
+
+async function openEpisodeDetail(episodeId){
+  episodeDetail = { id: episodeId, loading: true };
+  renderEpisodeDetailModal();
+  const info = await tvmazeEpisodeInfo(episodeId);
+  if(episodeDetail && episodeDetail.id === episodeId){
+    episodeDetail = { id: episodeId, loading: false, ...info };
+    renderEpisodeDetailModal();
+  }
+}
+
+function renderEpisodeDetailModal(){
+  let modal = document.getElementById('episode-detail-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'episode-detail-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:210;display:flex;align-items:flex-end;';
+    modal.onclick = (e)=>{ if(e.target === modal){ episodeDetail = null; renderEpisodeDetailModal(); } };
+    document.body.appendChild(modal);
+  }
+  if(!episodeDetail){ modal.remove(); return; }
+
+  if(episodeDetail.loading){
+    modal.innerHTML = `
+      <div style="background:var(--surface);width:100%;border-radius:20px 20px 0 0;padding:30px 20px calc(20px + env(safe-area-inset-bottom));text-align:center;">
+        <div class="spinner"></div>
+      </div>`;
+  } else if(!episodeDetail.name){
+    modal.innerHTML = `
+      <div style="background:var(--surface);width:100%;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));">
+        <p style="color:var(--ink-soft);">No pudimos cargar este episodio.</p>
+        <button class="ghost-btn" id="close-ep-detail" style="width:100%;margin-top:8px;">Cerrar</button>
+      </div>`;
+  } else {
+    const dateLabel = episodeDetail.airdate ? new Date(episodeDetail.airdate+'T00:00:00').toLocaleDateString('es-AR', { day:'numeric', month:'long', year:'numeric' }) : 'Sin fecha';
+    modal.innerHTML = `
+      <div style="background:var(--surface);width:100%;border-radius:20px 20px 0 0;max-height:85vh;overflow-y:auto;padding-bottom:calc(20px + env(safe-area-inset-bottom));">
+        ${episodeDetail.image ? `<img src="${episodeDetail.image}" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;"/>` : ''}
+        <div style="padding:18px 20px 0;">
+          <div style="font-weight:800;font-size:19px;">${escapeHtml(episodeDetail.name)}</div>
+          <div style="color:var(--ink-soft);font-size:13px;margin-top:4px;">Estreno: ${dateLabel}</div>
+          ${episodeDetail.summary ? `<p style="font-size:14px;line-height:1.5;margin:14px 0 0;">${escapeHtml(episodeDetail.summary)}</p>` : ''}
+          ${episodeDetail.guestcast.length ? `
+            <div style="font-size:13px;font-weight:700;color:var(--ink-soft);margin-top:16px;">Elenco invitado</div>
+            <div style="font-size:14px;margin-top:6px;line-height:1.6;">${episodeDetail.guestcast.map(g=>`${escapeHtml(g.name)}${g.character?' <span style="color:var(--ink-soft);">como '+escapeHtml(g.character)+'</span>':''}`).join('<br>')}</div>
+          ` : ''}
+          <button class="ghost-btn" id="close-ep-detail" style="width:100%;margin-top:20px;">Cerrar</button>
+        </div>
+      </div>`;
+  }
+  const closeBtn = document.getElementById('close-ep-detail');
+  if(closeBtn) closeBtn.onclick = ()=>{ episodeDetail = null; renderEpisodeDetailModal(); };
 }
 
 let searchPreview = null;
